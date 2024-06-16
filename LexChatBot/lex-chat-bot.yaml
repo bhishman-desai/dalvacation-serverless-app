@@ -193,9 +193,12 @@ Resources:
                 - Utterance: "How long is my stay?"
               DialogCodeHook:
                 Enabled: true
+              SlotPriorities:
+                - Priority: 1
+                  SlotName: "BookingReference"
               Slots:
                 - Name: "BookingReference"
-                  SlotTypeName: "AMAZON.Alphanumeric"
+                  SlotTypeName: "AMAZON.AlphaNumeric"
                   ValueElicitationSetting:
                     SlotConstraint: "Required"
                     PromptSpecification:
@@ -212,9 +215,12 @@ Resources:
                 - Utterance: "I need to talk to an agent."
               DialogCodeHook:
                 Enabled: true
+              SlotPriorities:
+                - Priority: 1
+                  SlotName: "MessageContent"
               Slots:
                 - Name: "MessageContent"
-                  SlotTypeName: "AMAZON.Text"
+                  SlotTypeName: "AMAZON.FreeFormInput"
                   ValueElicitationSetting:
                     SlotConstraint: "Required"
                     PromptSpecification:
@@ -236,7 +242,7 @@ Resources:
       BotVersionLocaleSpecification:
         - LocaleId: "en_US"
           BotVersionLocaleDetails:
-            SourceBotVersion: "DRAFT"
+            SourceBotVersion: DRAFT
       Description: "Version"
 
   HotelBookingBotAlias:
@@ -247,7 +253,7 @@ Resources:
     Properties:
       BotAliasName: "ProdAlias"
       BotId: !Ref HotelBookingBot
-      BotVersion: !Ref HotelBookingBotVersion
+      BotVersion: !GetAtt HotelBookingBotVersion.BotVersion
       BotAliasLocaleSettings:
         - LocaleId: "en_US"
           BotAliasLocaleSetting:
@@ -257,7 +263,8 @@ Resources:
           - Enabled: true
             Destination:
               CloudWatch:
-                LogGroupArn: !GetAtt LogGroup.Arn
+                CloudWatchLogGroupArn: !GetAtt LogGroup.Arn
+                LogPrefix: "HotelBookingBotLogs"
       Description: "Production alias for the Hotel Booking Bot"
 
   LogGroup:
