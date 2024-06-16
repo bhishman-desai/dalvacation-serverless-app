@@ -171,34 +171,33 @@ Resources:
         ChildDirected: false
       IdleSessionTTLInSeconds: 300
       Description: "A bot to handle hotel bookings"
-      AutoBuildBotLocales: false
       BotLocales:
         - LocaleId: "en_US"
           Description: "English (US)"
-          NluConfidenceThreshold: 0.4
+          NluConfidenceThreshold: 0.40
           VoiceSettings:
-            VoiceId: "Joanna"
+            VoiceId: "Ivy"
           Intents:
-            - IntentName: "BasicNavigationIntent"
+            - Name: "BasicNavigationIntent"
               Description: "Provides basic navigation information"
               SampleUtterances:
-                - "How do I register?"
-                - "Where can I find my bookings?"
-                - "How do I reset my password?"
+                - Utterance: "How do I register?"
+                - Utterance: "Where can I find my bookings?"
+                - Utterance: "How do I reset my password?"
               DialogCodeHook:
                 Enabled: true
             - Name: "GetRoomDetailsIntent"
               Description: "Gets room number and duration of stay based on booking reference number"
               SampleUtterances:
-                - "What is my room number?"
-                - "How long is my stay?"
+                - Utterance: "What is my room number?"
+                - Utterance: "How long is my stay?"
               DialogCodeHook:
                 Enabled: true
               Slots:
                 - Name: "BookingReference"
                   SlotTypeName: "AMAZON.Alphanumeric"
                   ValueElicitationSetting:
-                    SlotConstraint: Required
+                    SlotConstraint: "Required"
                     PromptSpecification:
                       MessageGroupsList:
                         - Message:
@@ -209,15 +208,15 @@ Resources:
             - Name: "PublishMessageToAgentIntent"
               Description: "Publishes a message to a property agent"
               SampleUtterances:
-                - "I have an issue with my booking."
-                - "I need to talk to an agent."
+                - Utterance: "I have an issue with my booking."
+                - Utterance: "I need to talk to an agent."
               DialogCodeHook:
                 Enabled: true
               Slots:
                 - Name: "MessageContent"
                   SlotTypeName: "AMAZON.Text"
                   ValueElicitationSetting:
-                    SlotConstraint: Required
+                    SlotConstraint: "Required"
                     PromptSpecification:
                       MessageGroupsList:
                         - Message:
@@ -225,27 +224,47 @@ Resources:
                               Value: "Please describe your issue."
                       MaxRetries: 3
                       AllowInterrupt: true
-            - Name: "AMAZON.FallbackIntent"
+            - Name: "FallbackIntent"
               Description: "Fallback intent when no other intent matches"
               ParentIntentSignature: "AMAZON.FallbackIntent"
 
-    HotelBookingBotVersion:
-      Type: AWS::Lex::BotVersion
-      Properties:
-        BotId: !Ref HotelBookingBot
-        BotVersionLocaleSpecification:
-          - LocaleId: "en_US"
-            BotVersionLocaleDetails:
-              SourceBotVersion: DRAFT
+  HotelBookingBotVersion:
+    DependsOn: HotelBookingBot
+    Type: AWS::Lex::BotVersion
+    Properties:
+      BotId: !Ref HotelBookingBot
+      BotVersionLocaleSpecification:
+        - LocaleId: "en_US"
+          BotVersionLocaleDetails:
+            SourceBotVersion: "DRAFT"
+      Description: "Version"
 
-    HotelBookingBotAlias:
-      Type: AWS::Lex::BotAlias
-      Properties:
-        BotId: !Ref HotelBookingBot
-        BotAliasName: "HotelBookingBotAlias"
-        BotVersion: !GetAtt HotelBookingBotVersion.BotVersion
-        SentimentAnalysisSettings:
-          DetectSentiment: true
+  HotelBookingBotAlias:
+    DependsOn:
+      - HotelBookingBotVersion
+      - LogGroup
+    Type: AWS::Lex::BotAlias
+    Properties:
+      BotAliasName: "ProdAlias"
+      BotId: !Ref HotelBookingBot
+      BotVersion: !Ref HotelBookingBotVersion
+      BotAliasLocaleSettings:
+        - LocaleId: "en_US"
+          BotAliasLocaleSetting:
+            Enabled: true
+      ConversationLogSettings:
+        TextLogSettings:
+          - Enabled: true
+            Destination:
+              CloudWatch:
+                LogGroupArn: !GetAtt LogGroup.Arn
+      Description: "Production alias for the Hotel Booking Bot"
+
+  LogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: "/aws/lex/HotelBookingBot"
+      RetentionInDays: 14
 
 Outputs:
   LexBotName:
