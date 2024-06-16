@@ -1,0 +1,226 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: CloudFormation template to create a hotel booking system chatbot with AWS Lex and Lambda functions.
+
+Parameters:
+  RoleArn:
+    Description: Existing IAM role ARN
+    Type: String
+    Default: arn:aws:iam::166633657396:role/LabRole
+
+Resources:
+  # Lambda Function for Getting Room Information
+  GetRoomLambdaFunction:
+    Type: 'AWS::Lambda::Function'
+    Properties:
+      FunctionName: 'getRoom'
+      Handler: 'index.getRoom'
+      Role: !Ref RoleArn
+      Runtime: 'python3.8'
+      Code:
+        ZipFile: |
+          import json
+          import boto3
+          from boto3.dynamodb.conditions import Key
+
+          def validate_reference_number(reference_number):
+              if reference_number.isdigit() and len(reference_number) == 6:
+                  return True
+              return False
+
+          def getRoom(event, context):
+              dynamodb = boto3.resource('dynamodb')
+              table = dynamodb.Table('rooms')
+          
+              reference_number = event['currentIntent']['slots'].get('ReferenceNumber')
+          
+              if not reference_number:
+                  return {
+                      'dialogAction': {
+                          'type': 'ElicitSlot',
+                          'intentName': event['currentIntent']['name'],
+                          'slots': event['currentIntent']['slots'],
+                          'slotToElicit': 'ReferenceNumber',
+                          'message': {
+                              'contentType': 'PlainText',
+                              'content': 'Please provide your booking reference number.'
+                          }
+                      }
+                  }
+          
+              if not validate_reference_number(reference_number):
+                  return {
+                      'dialogAction': {
+                          'type': 'ElicitSlot',
+                          'intentName': event['currentIntent']['name'],
+                          'slots': event['currentIntent']['slots'],
+                          'slotToElicit': 'ReferenceNumber',
+                          'message': {
+                              'contentType': 'PlainText',
+                              'content': 'The reference number is invalid. It should be a 6-digit number.'
+                          }
+                      }
+                  }
+          
+              try:
+                  response = table.get_item(Key={'reference_number': reference_number})
+                  if 'Item' in response:
+                      room_number = response['Item']['room_number']
+                      duration = response['Item']['duration']
+                      return {
+                          'dialogAction': {
+                              'type': 'Close',
+                              'fulfillmentState': 'Fulfilled',
+                              'message': {
+                                  'contentType': 'PlainText',
+                                  'content': f"Room number is {room_number} and the duration of stay is {duration} days."
+                              }
+                          }
+                      }
+                  else:
+                      return {
+                          'dialogAction': {
+                              'type': 'Close',
+                              'fulfillmentState': 'Failed',
+                              'message': {
+                                  'contentType': 'PlainText',
+                                  'content': 'The reference number provided does not exist.'
+                              }
+                          }
+                      }
+              except Exception as e:
+                  return {
+                      'dialogAction': {
+                          'type': 'Close',
+                          'fulfillmentState': 'Failed',
+                          'message': {
+                              'contentType': 'PlainText',
+                              'content': f"An error occurred: {str(e)}"
+                          }
+                      }
+                  }
+
+  # Lambda Function for Publishing Message to Agent
+  PublishMessageLambdaFunction:
+    Type: 'AWS::Lambda::Function'
+    Properties:
+      FunctionName: 'publishMessage'
+      Handler: 'index.publishMessage'
+      Role: !Ref RoleArn
+      Runtime: 'python3.8'
+      Code:
+        ZipFile: |
+          import json
+          from google.cloud import pubsub_v1
+          import random
+
+          def publishMessage(event, context):
+              client = pubsub_v1.PublisherClient()
+              project_id = 'YOUR_PROJECT_ID'
+              topics = ['agent-topic1', 'agent-topic2', 'agent-topic3']
+              topic = random.choice(topics)
+              topic_path = client.topic_path(project_id, topic)
+          
+              message = event['currentIntent']['slots'].get('Message')
+          
+              if not message:
+                  return {
+                      'dialogAction': {
+                          'type': 'ElicitSlot',
+                          'intentName': event['currentIntent']['name'],
+                          'slots': event['currentIntent']['slots'],
+                          'slotToElicit': 'Message',
+                          'message': {
+                              'contentType': 'PlainText',
+                              'content': 'Please provide the message you want to send to the agent.'
+                          }
+                      }
+                  }
+          
+              try:
+                  future = client.publish(topic_path, message.encode('utf-8'))
+                  future.result()
+                  return {
+                      'dialogAction': {
+                          'type': 'Close',
+                          'fulfillmentState': 'Fulfilled',
+                          'message': {
+                              'contentType': 'PlainText',
+                              'content': 'Your message has been sent to the property agent.'
+                          }
+                      }
+                  }
+              except Exception as e:
+                  return {
+                      'dialogAction': {
+                          'type': 'Close',
+                          'fulfillmentState': 'Failed',
+                          'message': {
+                              'contentType': 'PlainText',
+                              'content': f"An error occurred: {str(e)}"
+                          }
+                      }
+                  }
+
+  # Lex Bot
+  HotelBookingBot:
+    Type: 'AWS::Lex::Bot'
+    Properties:
+      Name: 'HotelBookingBot'
+      Description: 'Hotel booking system chatbot'
+      Intents:
+        - Intent:
+            Name: 'BasicNavigation'
+            Description: 'Provides basic navigation information'
+            SampleUtterances:
+              - 'How do I register?'
+              - 'How do I book a room?'
+              - 'How do I contact support?'
+              - 'Where can I find my bookings?'
+            FulfillmentActivity:
+              Type: 'ReturnIntent'
+        - Intent:
+            Name: 'GetRoomInfo'
+            Description: 'Provides room number and duration of stay'
+            SampleUtterances:
+              - 'Get room information for {ReferenceNumber}'
+            Slots:
+              - Name: 'ReferenceNumber'
+                SlotType: 'AMAZON.Number'
+                SlotConstraint: 'Required'
+            FulfillmentActivity:
+              Type: 'CodeHook'
+              CodeHook:
+                Uri: !GetAtt GetRoomLambdaFunction.Arn
+                MessageVersion: '1.0'
+        - Intent:
+            Name: 'PublishMessageToAgent'
+            Description: 'Publishes message to property agent'
+            SampleUtterances:
+              - 'Send message to agent: {Message}'
+            Slots:
+              - Name: 'Message'
+                SlotType: 'AMAZON.Text'
+                SlotConstraint: 'Required'
+            FulfillmentActivity:
+              Type: 'CodeHook'
+              CodeHook:
+                Uri: !GetAtt PublishMessageLambdaFunction.Arn
+                MessageVersion: '1.0'
+      ChildDirected: false
+      Locale: 'en-US'
+      ClarificationPrompt:
+        MaxAttempts: 2
+        Messages:
+          - ContentType: 'PlainText'
+            Content: 'I did not understand that, can you please repeat?'
+      AbortStatement:
+        Messages:
+          - ContentType: 'PlainText'
+            Content: 'Sorry, I am unable to assist at the moment. Please try again later.'
+      VoiceId: 'Joanna'
+      IdleSessionTTLInSeconds: 300
+
+Outputs:
+  LexBotName:
+    Description: 'Name of the Lex Bot'
+    Value: !Ref HotelBookingBot
