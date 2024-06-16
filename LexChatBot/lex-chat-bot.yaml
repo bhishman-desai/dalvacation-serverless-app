@@ -10,7 +10,7 @@ Parameters:
 Resources:
   # Lambda Function for Getting Room Information
   GetRoomLambdaFunction:
-    Type: 'AWS::Lambda::Function'
+    Type: AWS::Lambda::Function
     Properties:
       FunctionName: 'getRoom'
       Handler: 'index.getRoom'
@@ -101,7 +101,7 @@ Resources:
 
   # Lambda Function for Publishing Message to Agent
   PublishMessageLambdaFunction:
-    Type: 'AWS::Lambda::Function'
+    Type: AWS::Lambda::Function
     Properties:
       FunctionName: 'publishMessage'
       Handler: 'index.publishMessage'
@@ -163,62 +163,89 @@ Resources:
 
   # Lex Bot
   HotelBookingBot:
-    Type: 'AWS::Lex::Bot'
+    Type: AWS::Lex::Bot
     Properties:
-      Name: 'HotelBookingBot'
-      Description: 'Hotel booking system chatbot'
-      Intents:
-        - Intent:
-            Name: 'BasicNavigation'
-            Description: 'Provides basic navigation information'
-            SampleUtterances:
-              - 'How do I register?'
-              - 'How do I book a room?'
-              - 'How do I contact support?'
-              - 'Where can I find my bookings?'
-            FulfillmentActivity:
-              Type: 'ReturnIntent'
-        - Intent:
-            Name: 'GetRoomInfo'
-            Description: 'Provides room number and duration of stay'
-            SampleUtterances:
-              - 'Get room information for {ReferenceNumber}'
-            Slots:
-              - Name: 'ReferenceNumber'
-                SlotType: 'AMAZON.Number'
-                SlotConstraint: 'Required'
-            FulfillmentActivity:
-              Type: 'CodeHook'
-              CodeHook:
-                Uri: !GetAtt GetRoomLambdaFunction.Arn
-                MessageVersion: '1.0'
-        - Intent:
-            Name: 'PublishMessageToAgent'
-            Description: 'Publishes message to property agent'
-            SampleUtterances:
-              - 'Send message to agent: {Message}'
-            Slots:
-              - Name: 'Message'
-                SlotType: 'AMAZON.Text'
-                SlotConstraint: 'Required'
-            FulfillmentActivity:
-              Type: 'CodeHook'
-              CodeHook:
-                Uri: !GetAtt PublishMessageLambdaFunction.Arn
-                MessageVersion: '1.0'
-      ChildDirected: false
-      Locale: 'en-US'
-      ClarificationPrompt:
-        MaxAttempts: 2
-        Messages:
-          - ContentType: 'PlainText'
-            Content: 'I did not understand that, can you please repeat?'
-      AbortStatement:
-        Messages:
-          - ContentType: 'PlainText'
-            Content: 'Sorry, I am unable to assist at the moment. Please try again later.'
-      VoiceId: 'Joanna'
+      Name: "HotelBookingBot"
+      RoleArn: !Ref RoleArn
+      DataPrivacy:
+        ChildDirected: false
       IdleSessionTTLInSeconds: 300
+      Description: "A bot to handle hotel bookings"
+      AutoBuildBotLocales: false
+      BotLocales:
+        - LocaleId: "en_US"
+          Description: "English (US)"
+          NluConfidenceThreshold: 0.4
+          VoiceSettings:
+            VoiceId: "Joanna"
+          Intents:
+            - IntentName: "BasicNavigationIntent"
+              Description: "Provides basic navigation information"
+              SampleUtterances:
+                - "How do I register?"
+                - "Where can I find my bookings?"
+                - "How do I reset my password?"
+              DialogCodeHook:
+                Enabled: true
+            - Name: "GetRoomDetailsIntent"
+              Description: "Gets room number and duration of stay based on booking reference number"
+              SampleUtterances:
+                - "What is my room number?"
+                - "How long is my stay?"
+              DialogCodeHook:
+                Enabled: true
+              Slots:
+                - Name: "BookingReference"
+                  SlotTypeName: "AMAZON.Alphanumeric"
+                  ValueElicitationSetting:
+                    SlotConstraint: Required
+                    PromptSpecification:
+                      MessageGroupsList:
+                        - Message:
+                            PlainTextMessage:
+                              Value: "Please provide your booking reference number."
+                      MaxRetries: 3
+                      AllowInterrupt: true
+            - Name: "PublishMessageToAgentIntent"
+              Description: "Publishes a message to a property agent"
+              SampleUtterances:
+                - "I have an issue with my booking."
+                - "I need to talk to an agent."
+              DialogCodeHook:
+                Enabled: true
+              Slots:
+                - Name: "MessageContent"
+                  SlotTypeName: "AMAZON.Text"
+                  ValueElicitationSetting:
+                    SlotConstraint: Required
+                    PromptSpecification:
+                      MessageGroupsList:
+                        - Message:
+                            PlainTextMessage:
+                              Value: "Please describe your issue."
+                      MaxRetries: 3
+                      AllowInterrupt: true
+            - Name: "AMAZON.FallbackIntent"
+              Description: "Fallback intent when no other intent matches"
+              ParentIntentSignature: "AMAZON.FallbackIntent"
+
+    HotelBookingBotVersion:
+      Type: AWS::Lex::BotVersion
+      Properties:
+        BotId: !Ref HotelBookingBot
+        BotVersionLocaleSpecification:
+          - LocaleId: "en_US"
+            BotVersionLocaleDetails:
+              SourceBotVersion: DRAFT
+
+    HotelBookingBotAlias:
+      Type: AWS::Lex::BotAlias
+      Properties:
+        BotId: !Ref HotelBookingBot
+        BotAliasName: "HotelBookingBotAlias"
+        BotVersion: !GetAtt HotelBookingBotVersion.BotVersion
+        SentimentAnalysisSettings:
+          DetectSentiment: true
 
 Outputs:
   LexBotName:
