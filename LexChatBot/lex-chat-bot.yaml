@@ -14,6 +14,10 @@ Parameters:
     Description: Google Cloud Platform Project ID
     Type: String
     Default: YOUR_PROJECT_ID
+  UserPoolId:
+    Description: AWS Cognito User Pool ID
+    Type: String
+    Default: YOUR_USER_POOL_ID
 
 Resources:
   # Combined Lambda Function for Getting Room Information and Publishing Message to Agent
@@ -35,6 +39,9 @@ Resources:
 
           # Initialize DynamoDB resource
           dynamodb = boto3.resource('dynamodb')
+
+          # Initialize Cognito client
+          cognito_client = boto3.client('cognito-idp')
 
           def validate_reference_number(reference_number):
               """
@@ -116,6 +123,32 @@ Resources:
                       }
                   }
 
+          def check_user_email(email):
+              """
+              Validates if the user exists in the Cognito user pool.
+              """
+              user_pool_id = os.environ['USER_POOL_ID']
+              try:
+                  response = cognito_client.list_users(
+                      UserPoolId=user_pool_id,
+                      Filter=f'email="{email}"'
+                  )
+                  if response['Users']:
+                      return True
+                  else:
+                      return False
+              except Exception as e:
+                  return {
+                      'dialogAction': {
+                          'type': 'Close',
+                          'fulfillmentState': 'Failed',
+                          'message': {
+                              'contentType': 'PlainText',
+                              'content': f"An error occurred: {str(e)}"
+                          }
+                      }
+                  }
+
           def publishMessage(event):
               """
               Handles the 'PublishMessageToAgentIntent' by publishing a message to a random GCP Pub/Sub topic.
@@ -126,7 +159,36 @@ Resources:
               topic = random.choice(topics)
               topic_path = client.topic_path(project_id, topic.split('/')[-1])
 
+              email = event['currentIntent']['slots'].get('Email')
               message = event['currentIntent']['slots'].get('Message')
+
+              if not email:
+                  return {
+                      'dialogAction': {
+                          'type': 'ElicitSlot',
+                          'intentName': event['currentIntent']['name'],
+                          'slots': event['currentIntent']['slots'],
+                          'slotToElicit': 'Email',
+                          'message': {
+                              'contentType': 'PlainText',
+                              'content': 'Please provide your email address.'
+                          }
+                      }
+                  }
+
+              if not check_user_email(email):
+                  return {
+                      'dialogAction': {
+                          'type': 'ElicitSlot',
+                          'intentName': event['currentIntent']['name'],
+                          'slots': event['currentIntent']['slots'],
+                          'slotToElicit': 'Email',
+                          'message': {
+                              'contentType': 'PlainText',
+                              'content': 'The email provided does not exist. Please check your email address.'
+                          }
+                      }
+                  }
 
               if not message:
                   return {
@@ -192,6 +254,7 @@ Resources:
         Variables:
           DYNAMODB_TABLE_NAME: !Ref DynamoDBTableName
           GCP_PROJECT_ID: !Ref GCPProjectId
+          USER_POOL_ID: !Ref UserPoolId
 
   # Lex Bot
   HotelBookingBot:
@@ -271,8 +334,21 @@ Resources:
                 Enabled: true
               SlotPriorities:
                 - Priority: 1
+                  SlotName: "Email"
+                - Priority: 2
                   SlotName: "MessageContent"
               Slots:
+                - Name: "Email"
+                  SlotTypeName: "AMAZON.EmailAddress"
+                  ValueElicitationSetting:
+                    SlotConstraint: "Required"
+                    PromptSpecification:
+                      MessageGroupsList:
+                        - Message:
+                            PlainTextMessage:
+                              Value: "Please provide your email address."
+                      MaxRetries: 3
+                      AllowInterrupt: true
                 - Name: "MessageContent"
                   SlotTypeName: "AMAZON.FreeFormInput"
                   ValueElicitationSetting:
