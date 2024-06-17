@@ -256,6 +256,16 @@ Resources:
           GCP_PROJECT_ID: !Ref GCPProjectId
           USER_POOL_ID: !Ref UserPoolId
 
+  # Permission for Lex Bot to invoke Lambda function
+  LambdaInvokePermission:
+    DependsOn: HotelBookingBotAlias
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !GetAtt ValidateAndStoreLambdaFunction.Arn
+      Action: lambda:InvokeFunction
+      Principal: lex.amazonaws.com
+      SourceArn:  !GetAtt HotelBookingBotAlias.Arn
+
   # Lex Bot
   HotelBookingBot:
     DependsOn:
