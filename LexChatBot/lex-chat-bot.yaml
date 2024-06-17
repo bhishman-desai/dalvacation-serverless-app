@@ -163,6 +163,9 @@ Resources:
 
   # Lex Bot
   HotelBookingBot:
+    DependsOn:
+      - GetRoomLambdaFunction
+      - PublishMessageLambdaFunction
     Type: AWS::Lex::Bot
     Properties:
       Name: "HotelBookingBot"
@@ -233,45 +236,6 @@ Resources:
             - Name: "FallbackIntent"
               Description: "Fallback intent when no other intent matches"
               ParentIntentSignature: "AMAZON.FallbackIntent"
-
-  HotelBookingBotVersion:
-    DependsOn: HotelBookingBot
-    Type: AWS::Lex::BotVersion
-    Properties:
-      BotId: !Ref HotelBookingBot
-      BotVersionLocaleSpecification:
-        - LocaleId: "en_US"
-          BotVersionLocaleDetails:
-            SourceBotVersion: DRAFT
-      Description: "Version"
-
-  HotelBookingBotAlias:
-    DependsOn:
-      - HotelBookingBotVersion
-      - LogGroup
-    Type: AWS::Lex::BotAlias
-    Properties:
-      BotAliasName: "ProdAlias"
-      BotId: !Ref HotelBookingBot
-      BotVersion: !GetAtt HotelBookingBotVersion.BotVersion
-      BotAliasLocaleSettings:
-        - LocaleId: "en_US"
-          BotAliasLocaleSetting:
-            Enabled: true
-      ConversationLogSettings:
-        TextLogSettings:
-          - Enabled: true
-            Destination:
-              CloudWatch:
-                CloudWatchLogGroupArn: !GetAtt LogGroup.Arn
-                LogPrefix: "HotelBookingBotLogs"
-      Description: "Production alias for the Hotel Booking Bot"
-
-  LogGroup:
-    Type: AWS::Logs::LogGroup
-    Properties:
-      LogGroupName: "/aws/lex/HotelBookingBot"
-      RetentionInDays: 14
 
 Outputs:
   LexBotName:
