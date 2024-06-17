@@ -217,9 +217,18 @@ Resources:
               SampleUtterances:
                 - Utterance: "How do I register?"
                 - Utterance: "Where can I find my bookings?"
-                - Utterance: "How do I reset my password?"
               DialogCodeHook:
                 Enabled: false
+              IntentClosingSetting:
+                ClosingResponse:
+                  MessageGroupsList:
+                    - Message:
+                        PlainTextMessage:
+                          Value: "Registration: Click Register Button on top right corner"
+                    - Message:
+                        PlainTextMessage:
+                          Value: "Bookings: Click Book Room / Recreation Book"
+                  AllowInterrupt: true
             - Name: "GetRoomDetailsIntent"
               Description: "Gets room number and duration of stay based on booking reference number"
               SampleUtterances:
