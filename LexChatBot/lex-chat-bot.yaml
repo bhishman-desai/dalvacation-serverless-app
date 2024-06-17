@@ -219,7 +219,7 @@ Resources:
                 - Utterance: "Where can I find my bookings?"
                 - Utterance: "How do I reset my password?"
               DialogCodeHook:
-                Enabled: true
+                Enabled: false
             - Name: "GetRoomDetailsIntent"
               Description: "Gets room number and duration of stay based on booking reference number"
               SampleUtterances:
@@ -268,7 +268,54 @@ Resources:
               Description: "Fallback intent when no other intent matches"
               ParentIntentSignature: "AMAZON.FallbackIntent"
 
+  # Lex Bot Alias
+  HotelBookingBotVersion:
+    DependsOn: HotelBookingBot
+    Type: AWS::Lex::BotVersion
+    Properties:
+      BotId: !Ref HotelBookingBot
+      BotVersionLocaleSpecification:
+        - LocaleId: "en_US"
+          BotVersionLocaleDetails:
+            SourceBotVersion: DRAFT
+      Description: "Chat Bot Version"
+
+  HotelBookingBotAlias:
+    DependsOn:
+      - HotelBookingBotVersion
+      - LogGroup
+    Type: AWS::Lex::BotAlias
+    Properties:
+      BotAliasName: "ProdAlias"
+      BotId: !Ref HotelBookingBot
+      BotVersion: !GetAtt HotelBookingBotVersion.BotVersion
+      BotAliasLocaleSettings:
+        - LocaleId: "en_US"
+          BotAliasLocaleSetting:
+            CodeHookSpecification:
+              LambdaCodeHook:
+                CodeHookInterfaceVersion: "1.0"
+                LambdaArn: !GetAtt ValidateAndStoreLambdaFunction.Arn
+            Enabled: true
+      ConversationLogSettings:
+        TextLogSettings:
+          - Enabled: true
+            Destination:
+              CloudWatch:
+                CloudWatchLogGroupArn: !GetAtt LogGroup.Arn
+                LogPrefix: "HotelBookingBotLogs"
+      Description: "Production alias for the Hotel Booking Bot"
+
+  LogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: "/aws/lex/HotelBookingBot"
+      RetentionInDays: 14
+
 Outputs:
   LexBotName:
     Description: 'Name of the Lex Bot'
     Value: !Ref HotelBookingBot
+  LexBotAliasName:
+    Description: 'Alias Name of the Lex Bot'
+    Value: !Ref HotelBookingBotAlias
