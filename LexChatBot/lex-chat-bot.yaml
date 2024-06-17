@@ -267,8 +267,20 @@ Resources:
             - Name: "FallbackIntent"
               Description: "Fallback intent when no other intent matches"
               ParentIntentSignature: "AMAZON.FallbackIntent"
+              IntentClosingSetting:
+                ClosingResponse:
+                  MessageGroupsList:
+                    - Message:
+                        PlainTextMessage:
+                          Value: "Sorry, I didn't understand that. Can you rephrase your question?"
+                      Variations:
+                        - PlainTextMessage:
+                            Value: "I apologize, but I didn't get that. Could you ask differently?"
+                        - PlainTextMessage:
+                            Value: "I'm having trouble understanding. Please try again."
+                  AllowInterrupt: true
 
-  # Lex Bot Alias
+  # Lex Bot Version
   HotelBookingBotVersion:
     DependsOn: HotelBookingBot
     Type: AWS::Lex::BotVersion
@@ -280,6 +292,7 @@ Resources:
             SourceBotVersion: DRAFT
       Description: "Chat Bot Version"
 
+  # Lex Bot Alias
   HotelBookingBotAlias:
     DependsOn:
       - HotelBookingBotVersion
@@ -306,6 +319,7 @@ Resources:
                 LogPrefix: "HotelBookingBotLogs"
       Description: "Production alias for the Hotel Booking Bot"
 
+  # Lex Bot Logs
   LogGroup:
     Type: AWS::Logs::LogGroup
     Properties:
