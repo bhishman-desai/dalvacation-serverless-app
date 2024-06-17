@@ -212,11 +212,11 @@ Resources:
           VoiceSettings:
             VoiceId: "Ivy"
           Intents:
-            - Name: "BasicNavigationIntent"
+            - Name: "RegisterNavigationIntent"
               Description: "Provides basic navigation information"
               SampleUtterances:
                 - Utterance: "How do I register?"
-                - Utterance: "Where can I find my bookings?"
+                - Utterance: "Can I know registration steps?"
               DialogCodeHook:
                 Enabled: false
               IntentClosingSetting:
@@ -225,6 +225,17 @@ Resources:
                     - Message:
                         PlainTextMessage:
                           Value: "Registration: Click Register Button on top right corner"
+                  AllowInterrupt: true
+            - Name: "FindBookingNavigationIntent"
+              Description: "Provides basic navigation information"
+              SampleUtterances:
+                - Utterance: "How do I book a room?"
+                - Utterance: "Where can I find the room booking option?"
+              DialogCodeHook:
+                Enabled: false
+              IntentClosingSetting:
+                ClosingResponse:
+                  MessageGroupsList:
                     - Message:
                         PlainTextMessage:
                           Value: "Bookings: Click Book Room / Recreation Book"
