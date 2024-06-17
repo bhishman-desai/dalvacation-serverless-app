@@ -6,14 +6,22 @@ Parameters:
     Description: Existing IAM role ARN
     Type: String
     Default: arn:aws:iam::166633657396:role/LabRole
+  DynamoDBTableName:
+    Description: DynamoDB table name for room information
+    Type: String
+    Default: rooms
+  GCPProjectId:
+    Description: Google Cloud Platform Project ID
+    Type: String
+    Default: YOUR_PROJECT_ID
 
 Resources:
-  # Lambda Function for Getting Room Information
-  GetRoomLambdaFunction:
+  # Combined Lambda Function for Getting Room Information and Publishing Message to Agent
+  ValidateAndStoreLambdaFunction:
     Type: AWS::Lambda::Function
     Properties:
-      FunctionName: 'getRoom'
-      Handler: 'index.getRoom'
+      FunctionName: 'validateAndStore'
+      Handler: 'index.handler'
       Role: !Ref RoleArn
       Runtime: 'python3.8'
       Code:
@@ -21,18 +29,27 @@ Resources:
           import json
           import boto3
           from boto3.dynamodb.conditions import Key
+          from google.cloud import pubsub_v1
+          import os
+          import random
+
+          # Initialize DynamoDB resource
+          dynamodb = boto3.resource('dynamodb')
 
           def validate_reference_number(reference_number):
-              if reference_number.isdigit() and len(reference_number) == 6:
-                  return True
-              return False
+              """
+              Validates the reference number. It should be a 6-digit number.
+              """
+              return reference_number.isdigit() and len(reference_number) == 6
 
-          def getRoom(event, context):
-              dynamodb = boto3.resource('dynamodb')
-              table = dynamodb.Table('rooms')
-          
+          def getRoom(event):
+              """
+              Handles the 'GetRoomDetailsIntent' by retrieving room information from DynamoDB.
+              """
+              table_name = os.environ['DYNAMODB_TABLE_NAME']
+              table = dynamodb.Table(table_name)
               reference_number = event['currentIntent']['slots'].get('ReferenceNumber')
-          
+
               if not reference_number:
                   return {
                       'dialogAction': {
@@ -46,7 +63,7 @@ Resources:
                           }
                       }
                   }
-          
+
               if not validate_reference_number(reference_number):
                   return {
                       'dialogAction': {
@@ -60,7 +77,7 @@ Resources:
                           }
                       }
                   }
-          
+
               try:
                   response = table.get_item(Key={'reference_number': reference_number})
                   if 'Item' in response:
@@ -99,29 +116,18 @@ Resources:
                       }
                   }
 
-  # Lambda Function for Publishing Message to Agent
-  PublishMessageLambdaFunction:
-    Type: AWS::Lambda::Function
-    Properties:
-      FunctionName: 'publishMessage'
-      Handler: 'index.publishMessage'
-      Role: !Ref RoleArn
-      Runtime: 'python3.8'
-      Code:
-        ZipFile: |
-          import json
-          from google.cloud import pubsub_v1
-          import random
-
-          def publishMessage(event, context):
+          def publishMessage(event):
+              """
+              Handles the 'PublishMessageToAgentIntent' by publishing a message to a random GCP Pub/Sub topic.
+              """
+              project_id = os.environ['GCP_PROJECT_ID']
               client = pubsub_v1.PublisherClient()
-              project_id = 'YOUR_PROJECT_ID'
-              topics = ['agent-topic1', 'agent-topic2', 'agent-topic3']
+              topics = [topic.name for topic in client.list_topics(request={"project": f"projects/{project_id}"})]
               topic = random.choice(topics)
-              topic_path = client.topic_path(project_id, topic)
-          
+              topic_path = client.topic_path(project_id, topic.split('/')[-1])
+
               message = event['currentIntent']['slots'].get('Message')
-          
+
               if not message:
                   return {
                       'dialogAction': {
@@ -135,7 +141,7 @@ Resources:
                           }
                       }
                   }
-          
+
               try:
                   future = client.publish(topic_path, message.encode('utf-8'))
                   future.result()
@@ -161,11 +167,36 @@ Resources:
                       }
                   }
 
+          def handler(event, context):
+              """
+              Main handler function that routes the incoming request to the appropriate intent handler.
+              """
+              intent_name = event['currentIntent']['name']
+              if intent_name == 'GetRoomDetailsIntent':
+                  return getRoom(event)
+              elif intent_name == 'PublishMessageToAgentIntent':
+                  return publishMessage(event)
+              else:
+                  return {
+                      'dialogAction': {
+                          'type': 'Close',
+                          'fulfillmentState': 'Failed',
+                          'message': {
+                              'contentType': 'PlainText',
+                              'content': 'Invalid intent.'
+                          }
+                      }
+                  }
+
+      Environment:
+        Variables:
+          DYNAMODB_TABLE_NAME: !Ref DynamoDBTableName
+          GCP_PROJECT_ID: !Ref GCPProjectId
+
   # Lex Bot
   HotelBookingBot:
     DependsOn:
-      - GetRoomLambdaFunction
-      - PublishMessageLambdaFunction
+      - ValidateAndStoreLambdaFunction
     Type: AWS::Lex::Bot
     Properties:
       Name: "HotelBookingBot"
