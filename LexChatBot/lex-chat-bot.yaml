@@ -30,12 +30,11 @@ Resources:
       Runtime: 'python3.8'
       Code:
         ZipFile: |
-          import json
+          import os
           import boto3
+          import random
           from boto3.dynamodb.conditions import Key
           from google.cloud import pubsub_v1
-          import os
-          import random
 
           # Initialize DynamoDB resource
           dynamodb = boto3.resource('dynamodb')
@@ -43,212 +42,183 @@ Resources:
           # Initialize Cognito client
           cognito_client = boto3.client('cognito-idp')
 
-          def validate_reference_number(reference_number):
+          def get_room(event):
               """
-              Validates the reference number. It should be a 6-digit number.
+              Retrieves room information based on the booking reference from DynamoDB.
+
+              Args:
+              - event (dict): The input event containing session state and intent details.
+
+              Returns:
+              - dict: Response object with session state and intent details.
               """
-              return reference_number.isdigit() and len(reference_number) == 6
-
-          def getRoom(event):
-              """
-              Handles the 'GetRoomDetailsIntent' by retrieving room information from DynamoDB.
-              """
-              table_name = os.environ['DYNAMODB_TABLE_NAME']
-              table = dynamodb.Table(table_name)
-              reference_number = event['currentIntent']['slots'].get('ReferenceNumber')
-
-              if not reference_number:
-                  return {
-                      'dialogAction': {
-                          'type': 'ElicitSlot',
-                          'intentName': event['currentIntent']['name'],
-                          'slots': event['currentIntent']['slots'],
-                          'slotToElicit': 'ReferenceNumber',
-                          'message': {
-                              'contentType': 'PlainText',
-                              'content': 'Please provide your booking reference number.'
-                          }
-                      }
-                  }
-
-              if not validate_reference_number(reference_number):
-                  return {
-                      'dialogAction': {
-                          'type': 'ElicitSlot',
-                          'intentName': event['currentIntent']['name'],
-                          'slots': event['currentIntent']['slots'],
-                          'slotToElicit': 'ReferenceNumber',
-                          'message': {
-                              'contentType': 'PlainText',
-                              'content': 'The reference number is invalid. It should be a 6-digit number.'
-                          }
-                      }
-                  }
-
               try:
+                  table_name = os.environ['DYNAMODB_TABLE_NAME']
+                  table = dynamodb.Table(table_name)
+
+                  # Extract reference number from slots
+                  booking_reference_slot = event['sessionState']['intent']['slots'].get('BookingReference')
+                  reference_number = booking_reference_slot.get('value', {}).get('originalValue') if booking_reference_slot else None
+
+                  # If reference number is not provided, elicit the slot
+                  if not reference_number:
+                      return elicit_slot_response('BookingReference', 'Please provide your booking reference number.', event)
+
                   response = table.get_item(Key={'reference_number': reference_number})
+
+                  # If item found in database, return room details
                   if 'Item' in response:
                       room_number = response['Item']['room_number']
                       duration = response['Item']['duration']
-                      return {
-                          'dialogAction': {
-                              'type': 'Close',
-                              'fulfillmentState': 'Fulfilled',
-                              'message': {
-                                  'contentType': 'PlainText',
-                                  'content': f"Room number is {room_number} and the duration of stay is {duration} days."
-                              }
-                          }
-                      }
+                      return close_response(event, f"Room number is {room_number} and the duration of stay is {duration} days.")
                   else:
-                      return {
-                          'dialogAction': {
-                              'type': 'Close',
-                              'fulfillmentState': 'Failed',
-                              'message': {
-                                  'contentType': 'PlainText',
-                                  'content': 'The reference number provided does not exist.'
-                              }
-                          }
-                      }
+                      # If reference number does not exist in database
+                      return close_response(event, "The reference number provided does not exist.", fulfillment_state="Failed")
+
               except Exception as e:
-                  return {
-                      'dialogAction': {
-                          'type': 'Close',
-                          'fulfillmentState': 'Failed',
-                          'message': {
-                              'contentType': 'PlainText',
-                              'content': f"An error occurred: {str(e)}"
-                          }
-                      }
-                  }
+                  return close_response(event, f"An error occurred: {str(e)}", fulfillment_state="Failed")
 
           def check_user_email(email):
               """
               Validates if the user exists in the Cognito user pool.
+
+              Args:
+              - email (str): Email address to validate.
+
+              Returns:
+              - bool: True if user exists, False otherwise.
               """
-              user_pool_id = os.environ['USER_POOL_ID']
               try:
+                  user_pool_id = os.environ['USER_POOL_ID']
                   response = cognito_client.list_users(
                       UserPoolId=user_pool_id,
                       Filter=f'email="{email}"'
                   )
-                  if response['Users']:
-                      return True
-                  else:
-                      return False
+                  return bool(response.get('Users'))
+
               except Exception as e:
-                  return {
-                      'dialogAction': {
-                          'type': 'Close',
-                          'fulfillmentState': 'Failed',
-                          'message': {
-                              'contentType': 'PlainText',
-                              'content': f"An error occurred: {str(e)}"
-                          }
-                      }
-                  }
+                  return f"An error occurred: {str(e)}"
 
-          def publishMessage(event):
+          def publish_message(event):
               """
-              Handles the 'PublishMessageToAgentIntent' by publishing a message to a random GCP Pub/Sub topic.
+              Publishes a message to a random GCP Pub/Sub topic.
+
+              Args:
+              - event (dict): The input event containing session state and intent details.
+
+              Returns:
+              - dict: Response object with session state and intent details.
               """
-              project_id = os.environ['GCP_PROJECT_ID']
-              client = pubsub_v1.PublisherClient()
-              topics = [topic.name for topic in client.list_topics(request={"project": f"projects/{project_id}"})]
-              topic = random.choice(topics)
-              topic_path = client.topic_path(project_id, topic.split('/')[-1])
-
-              email = event['currentIntent']['slots'].get('Email')
-              message = event['currentIntent']['slots'].get('Message')
-
-              if not email:
-                  return {
-                      'dialogAction': {
-                          'type': 'ElicitSlot',
-                          'intentName': event['currentIntent']['name'],
-                          'slots': event['currentIntent']['slots'],
-                          'slotToElicit': 'Email',
-                          'message': {
-                              'contentType': 'PlainText',
-                              'content': 'Please provide your email address.'
-                          }
-                      }
-                  }
-
-              if not check_user_email(email):
-                  return {
-                      'dialogAction': {
-                          'type': 'ElicitSlot',
-                          'intentName': event['currentIntent']['name'],
-                          'slots': event['currentIntent']['slots'],
-                          'slotToElicit': 'Email',
-                          'message': {
-                              'contentType': 'PlainText',
-                              'content': 'The email provided does not exist. Please check your email address.'
-                          }
-                      }
-                  }
-
-              if not message:
-                  return {
-                      'dialogAction': {
-                          'type': 'ElicitSlot',
-                          'intentName': event['currentIntent']['name'],
-                          'slots': event['currentIntent']['slots'],
-                          'slotToElicit': 'Message',
-                          'message': {
-                              'contentType': 'PlainText',
-                              'content': 'Please provide the message you want to send to the agent.'
-                          }
-                      }
-                  }
-
               try:
+                  project_id = os.environ['GCP_PROJECT_ID']
+                  client = pubsub_v1.PublisherClient()
+                  topics = [topic.name for topic in client.list_topics(request={"project": f"projects/{project_id}"})]
+                  topic = random.choice(topics)
+                  topic_path = client.topic_path(project_id, topic.split('/')[-1])
+
+                  email = event['sessionState']['intent']['slots'].get('Email', {}).get('value', {}).get('originalValue')
+                  message = event['sessionState']['intent']['slots'].get('MessageContent', {}).get('value', {}).get('originalValue')
+
+                  if not email:
+                      return elicit_slot_response('Email', 'Please provide your email address.', event)
+
+                  if not check_user_email(email):
+                      return elicit_slot_response('Email', 'The email provided does not exist. Please check your email address.', event)
+
+                  if not message:
+                      return elicit_slot_response('MessageContent', 'Please provide the message you want to send to the agent.', event)
+
                   future = client.publish(topic_path, message.encode('utf-8'))
                   future.result()
-                  return {
-                      'dialogAction': {
-                          'type': 'Close',
-                          'fulfillmentState': 'Fulfilled',
-                          'message': {
-                              'contentType': 'PlainText',
-                              'content': 'Your message has been sent to the property agent.'
-                          }
-                      }
-                  }
+                  return close_response(event, "Your message has been sent to the property agent.")
+
               except Exception as e:
-                  return {
-                      'dialogAction': {
-                          'type': 'Close',
-                          'fulfillmentState': 'Failed',
-                          'message': {
-                              'contentType': 'PlainText',
-                              'content': f"An error occurred: {str(e)}"
+                  return close_response(event, f"An error occurred: {str(e)}", fulfillment_state="Failed")
+
+          def elicit_slot_response(slot_to_elicit, message_content, event):
+              """
+              Generates a response to elicit a slot from the user.
+
+              Args:
+              - slot_to_elicit (str): Name of the slot to elicit.
+              - message_content (str): Content of the message to be displayed to the user.
+              - event (dict): The input event containing session state and intent details.
+
+              Returns:
+              - dict: Response object with session state and intent details.
+              """
+              return {
+                  "sessionState": {
+                      "dialogAction": {
+                          "type": "ElicitSlot",
+                          "slotToElicit": slot_to_elicit,
+                          "message": {
+                              "contentType": "PlainText",
+                              "content": message_content
                           }
+                      },
+                      "intent": {
+                          "name": event['sessionState']['intent']['name'],
+                          "slots": event['sessionState']['intent']['slots'],
+                          "state": "InProgress"
                       }
                   }
+              }
+
+          def close_response(event, content, fulfillment_state="Fulfilled"):
+              """
+              Generates a close response to end the conversation.
+
+              Args:
+              - event (dict): The input event containing session state and intent details.
+              - content (str): Content of the response message.
+              - fulfillment_state (str): State of fulfillment ("Fulfilled" or "Failed").
+
+              Returns:
+              - dict: Response object with session state, intent details, and message content.
+              """
+              return {
+                  "sessionState": {
+                      "dialogAction": {
+                          "type": "Close"
+                      },
+                      "intent": {
+                          "name": event['sessionState']['intent']['name'],
+                          "slots": event['sessionState']['intent']['slots'],
+                          "state": fulfillment_state
+                      }
+                  },
+                  "messages": [
+                      {
+                          "contentType": "PlainText",
+                          "content": content
+                      }
+                  ]
+              }
 
           def handler(event, context):
               """
               Main handler function that routes the incoming request to the appropriate intent handler.
+
+              Args:
+              - event (dict): The input event containing session state and intent details.
+              - context (object): Context object passed to Lambda function.
+
+              Returns:
+              - dict: Response object with session state, intent details, and message content.
               """
-              intent_name = event['currentIntent']['name']
-              if intent_name == 'GetRoomDetailsIntent':
-                  return getRoom(event)
-              elif intent_name == 'PublishMessageToAgentIntent':
-                  return publishMessage(event)
-              else:
-                  return {
-                      'dialogAction': {
-                          'type': 'Close',
-                          'fulfillmentState': 'Failed',
-                          'message': {
-                              'contentType': 'PlainText',
-                              'content': 'Invalid intent.'
-                          }
-                      }
-                  }
+              try:
+                  intent_name = event['sessionState']['intent']['name']
+
+                  if intent_name == 'GetRoomDetailsIntent':
+                      return get_room(event)
+                  elif intent_name == 'PublishMessageToAgentIntent':
+                      return publish_message(event)
+                  else:
+                      return close_response(event, "Invalid intent.", fulfillment_state="Failed")
+
+              except Exception as e:
+                  return close_response(event, f"An unexpected error occurred: {str(e)}", fulfillment_state="Failed")
 
       Environment:
         Variables:
