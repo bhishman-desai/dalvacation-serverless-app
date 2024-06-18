@@ -27,6 +27,8 @@ Resources:
       FunctionName: 'validateAndStore'
       Handler: 'index.handler'
       Role: !Ref RoleArn
+      Layers:
+        - !Ref LaxLayer
       Runtime: 'python3.8'
       Code:
         ZipFile: |
@@ -235,6 +237,17 @@ Resources:
       Action: lambda:InvokeFunction
       Principal: lex.amazonaws.com
       SourceArn:  !GetAtt HotelBookingBotAlias.Arn
+
+  # Layers
+  LaxLayer:
+    Type: AWS::Lambda::LayerVersion
+    Properties:
+      CompatibleRuntimes:
+        - python3.8
+      Content:
+        S3Bucket: dal-vacation
+        S3Key: lex-layer.zip
+      Description: Lax Layer
 
   # Lex Bot
   HotelBookingBot:
