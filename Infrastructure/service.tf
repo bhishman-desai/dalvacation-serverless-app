@@ -69,18 +69,36 @@ resource "google_cloudbuild_trigger" "github_trigger" {
       /* Use Docker to build the image */
       name = "gcr.io/cloud-builders/docker"
       args = ["build", "-t", "gcr.io/${var.project_id}/dal-vacation-service:latest", "."]
-      dir  = "Frontend" /* Specify the directory of the Dockerfile */
+      dir  = "Frontend/dal-vacation-app" /* Specify the directory of the Dockerfile */
     }
 
     /* Specify the image to be pushed to Google Container Registry */
     images = ["gcr.io/${var.project_id}/dal-vacation-service:latest"]
+
+
+    options {
+      logging = "CLOUD_LOGGING_ONLY"
+    }
   }
 }
 
 resource "google_service_account" "default" {
-  account_id   = var.account_id
-  project      = var.project_id
+  account_id = var.account_id
+
+  project = var.project_id
+
   display_name = "Service Account for project ${var.project_id}"
-  description  = "This service account is used by the project ${var.project_id}"
+
+  description = "This service account is used by the project ${var.project_id}"
 }
 
+/* For giving logging and pushing to artifact registry permissions */
+resource "google_project_iam_binding" "logs_writer_binding" {
+  project = var.project_id
+
+  role = "roles/editor"
+
+  members = [
+    "serviceAccount:${google_service_account.default.email}"
+  ]
+}
