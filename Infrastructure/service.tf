@@ -64,7 +64,7 @@ resource "null_resource" "trigger_run" {
 
   provisioner "local-exec" {
     command = <<EOT
-      gcloud builds submit --config cloudbuild.yaml .
+      gcloud alpha builds triggers run ${google_cloudbuild_trigger.github_trigger.name} --region=${var.region} --branch=main
     EOT
   }
 }
@@ -94,6 +94,11 @@ resource "google_cloud_run_v2_service" "dal_vacation_service" {
       /* Set the container image from Google Container Registry */
       image = "gcr.io/${var.project_id}/dal-vacation-service:latest"
 
+      /* Default port - 3000 for react app */
+      ports {
+        container_port = 80
+      }
+
       /* Environment Variables TODO: Change according to need later */
       env {
         name  = "FOO"
@@ -114,6 +119,24 @@ resource "google_cloud_run_v2_service" "dal_vacation_service" {
     type    = "TRAFFIC_TARGET_ALLOCATION_TYPE_LATEST"
     percent = 100
   }
+}
+
+/* To allow unauthenticated invocations for public API or website */
+data "google_iam_policy" "no-auth" {
+  binding {
+    role = "roles/run.invoker"
+    members = [
+      "allUsers",
+    ]
+  }
+}
+
+resource "google_cloud_run_service_iam_policy" "no-auth" {
+  location    = var.region
+  project     = var.project_id
+  service     = google_cloud_run_v2_service.dal_vacation_service.name
+
+  policy_data = data.google_iam_policy.no-auth.policy_data
 }
 
 
