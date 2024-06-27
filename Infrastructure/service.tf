@@ -132,9 +132,9 @@ data "google_iam_policy" "no-auth" {
 }
 
 resource "google_cloud_run_service_iam_policy" "no-auth" {
-  location    = var.region
-  project     = var.project_id
-  service     = google_cloud_run_v2_service.dal_vacation_service.name
+  location = var.region
+  project  = var.project_id
+  service  = google_cloud_run_v2_service.dal_vacation_service.name
 
   policy_data = data.google_iam_policy.no-auth.policy_data
 }
