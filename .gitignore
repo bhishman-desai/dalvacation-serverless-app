@@ -4,6 +4,7 @@
 /node_modules
 /.pnp
 .pnp.js
+/MessagePassing/function_code/node_modules
 
 # testing
 /coverage
