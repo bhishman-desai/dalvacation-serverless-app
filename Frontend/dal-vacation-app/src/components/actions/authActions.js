@@ -3,8 +3,8 @@ import axios from 'axios';
 export const signup = (credentials) => async (dispatch) => {
     try {
         const response = await axios.post('https://z5vur06rqi.execute-api.us-east-1.amazonaws.com/DalVacation/auth/storeUserDetails', credentials);
-        console.log(response.data);
-        dispatch({ type: 'SIGNUP', payload: response.data})
+        await dispatch({ type: 'SIGNUP', payload: response.data})
+        console.log("Signup", response.data);
     }
     catch (error) {
         dispatch({ type: 'FAILURE', payload: error.message });
@@ -14,7 +14,8 @@ export const signup = (credentials) => async (dispatch) => {
 export const login = (credentials) => async (dispatch) => {
     try {
         const response = await axios.post('https://z5vur06rqi.execute-api.us-east-1.amazonaws.com/DalVacation/auth/storeUserDetails', credentials);
-        dispatch({ type: 'LOGIN', payload: response.data})
+
+        // dispatch({ type: 'LOGIN', payload: response.data})
     }
     catch (error) {
         dispatch({ type: 'FAILURE', payload: error.message });
