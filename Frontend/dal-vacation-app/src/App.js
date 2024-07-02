@@ -7,6 +7,7 @@ import SecurityQuestions from './components/authentication/signup/SecurityQuesti
 import ConfirmSignup from './components/authentication/signup/ConfirmSignup';
 import CeaserCipher from './components/authentication/signup/CeaserCipher';
 import GetSecurityQuestion from './components/authentication/login/GetSecurityQuestion';
+import LoginCeaserCypher from './components/authentication/login/LoginCeaserCypher';
 function App() {
   return (
     <Router>
@@ -18,6 +19,7 @@ function App() {
         <Route path='/confirm/signup' element={<ConfirmSignup/>} />
         <Route path='/signup/ceaser-cypher' element={<CeaserCipher/>} />
         <Route path='/login/security-question' element={<GetSecurityQuestion/>} />
+        <Route path='/login/ceaser-cypher' element={<LoginCeaserCypher/>} />
       </Routes>
     </Router>
   );
