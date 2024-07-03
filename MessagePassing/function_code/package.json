@@ -1,10 +1,5 @@
 {
-  "name": "complaint-function",
-  "version": "1.0.0",
-  "main": "index.js",
   "dependencies": {
-    "@google-cloud/firestore": "^7.9.0",
-    "@google-cloud/functions-framework": "^3.4.0",
-    "@google-cloud/pubsub": "^4.5.0"
+    "@google-cloud/functions-framework": "^3.0.0"
   }
 }
