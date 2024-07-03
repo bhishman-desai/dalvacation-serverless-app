@@ -1,6 +1,7 @@
 variable "project_id" {
   description = "The GCP project ID"
   type        = string
+  default     = "serverless-426417"
 }
 
 variable "account_id" {
@@ -31,12 +32,6 @@ variable "function_runtime" {
   description = "The runtime for the Cloud Function"
   type        = string
   default     = "nodejs20"
-}
-
-variable "function_memory" {
-  description = "The memory allocated for the Cloud Function"
-  type        = number
-  default     = 128
 }
 
 variable "function_entry_point" {
