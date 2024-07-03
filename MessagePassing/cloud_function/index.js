@@ -1,7 +1,11 @@
+/* CONSUMER */
 const functions = require('@google-cloud/functions-framework');
 
 functions.cloudEvent('forwardComplaint', async (cloudEvent) => {
     const message = Buffer.from(cloudEvent.data.message.data, 'base64').toString();
+
+    /* Parse the JSON message */
+    const parsedMessage = JSON.parse(message);
 
     /* Forward to a random property agent */
     const propertyAgents = process.env.PROPERTY_AGENTS.split(',');

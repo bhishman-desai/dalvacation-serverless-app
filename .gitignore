@@ -4,7 +4,7 @@
 /node_modules
 /.pnp
 .pnp.js
-/MessagePassing/function_code/node_modules
+/MessagePassing/cloud_function/node_modules
 /MessagePassing/lambda/*.json
 
 # testing

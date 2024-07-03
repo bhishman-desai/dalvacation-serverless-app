@@ -1,3 +1,5 @@
+# PUBLISHER
+# POST: {"clientId": 123, "complaint": "The AC of room 123 is not working!"}
 import json
 import os
 from google.cloud import pubsub_v1
@@ -13,7 +15,7 @@ topic_path = publisher.topic_path(project_id, topic_id)
 
 def lambda_handler(event, context):
     """Lambda function to publish message to Pub/Sub."""
-    message = event.get('message')
+    message = event.get('body')
 
     if not message:
         return {
@@ -21,7 +23,7 @@ def lambda_handler(event, context):
             'body': json.dumps('Message not provided.')
         }
 
-    data = message.encode('utf-8')
+    data = json.dumps(message).encode('utf-8')
     try:
         future = publisher.publish(topic_path, data)
         message_id = future.result()
