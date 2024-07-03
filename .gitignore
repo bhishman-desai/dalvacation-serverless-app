@@ -5,6 +5,7 @@
 /.pnp
 .pnp.js
 /MessagePassing/function_code/node_modules
+/MessagePassing/lambda/*.json
 
 # testing
 /coverage
