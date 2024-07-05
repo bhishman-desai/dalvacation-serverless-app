@@ -9,12 +9,14 @@ import CeaserCipher from './components/authentication/signup/CeaserCipher';
 import GetSecurityQuestion from './components/authentication/login/GetSecurityQuestion';
 import LoginCeaserCypher from './components/authentication/login/LoginCeaserCypher';
 import Footer from './components/footer/Footer';
+import Home from './components/homePage/Home';
 function App() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
     <Router>
       <Navbar/>
       <Routes>
+        <Route path='/' element={<Home/>} />
         <Route path='/signup' element={<Signup/>} />
         <Route path='/login' element={<Login/>} />
         <Route path='/signup/security-questions' element={<SecurityQuestions/>} />

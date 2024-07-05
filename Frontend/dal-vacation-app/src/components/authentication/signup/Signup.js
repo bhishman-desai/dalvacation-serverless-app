@@ -106,9 +106,6 @@ function Signup() {
           boxShadow: 3,
           borderRadius: 2,
           backgroundColor: "background.paper",
-          borderColor: "primary.main",
-          borderWidth: 1,
-          borderStyle: "solid",
           maxHeight: "80vh",
           overflow: "auto",
           "&::-webkit-scrollbar": {

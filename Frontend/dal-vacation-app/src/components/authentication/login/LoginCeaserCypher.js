@@ -66,9 +66,8 @@ function LoginCeaserCypher() {
     <Container maxWidth="sm">
       <Box
         display="flex"
-        justifyContent="center"
         alignItems="center"
-        minHeight="100vh"
+        minHeight="60vh"
       >
         <Paper elevation={3} sx={{ p: 4, width: "100%" }}>
           <Typography variant="h4" component="h1" gutterBottom align="center">

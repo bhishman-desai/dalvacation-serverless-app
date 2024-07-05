@@ -4,6 +4,7 @@ import {
   Toolbar,
   Typography,
   Button,
+  Box, // Import Box component
 } from "@mui/material";
 
 function Navbar() {
@@ -15,7 +16,8 @@ function Navbar() {
     {
       name: isLoggedIn ? "Logout" : "Login",
     }
-  ]
+  ];
+
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("email");
@@ -24,14 +26,50 @@ function Navbar() {
     }
     navigate("/");
   };
+
   return (
     <AppBar position="static" color="primary">
-      <Toolbar>
-        {token ? (
+      <Toolbar sx={{ justifyContent: 'space-between' }}>
+        <Typography variant="h6" component={Link} to="/" color={'white'} fontWeight={'bold'}>
+          DalVacationHome
+        </Typography>
+
+        {!token && (
+          <Box sx={{ display: 'flex', gap: 2 }}>
+            <Button
+              color="inherit"
+              component={Link}
+              to="/"
+              sx={{ ml: 2 }}
+            >
+              Home
+            </Button>
+            <Button
+              color="inherit"
+              component={Link}
+              to="/signup"
+              sx={{ ml: 2 }}
+            >
+              Signup
+            </Button>
+            {
+              authentication.map((item) => (
+                <Button
+                  color="inherit"
+                  component={Link}
+                  onClick={handleLogout}
+                  to={item.name === "Login" ? "/login" : "/"}
+                  sx={{ ml: 2 }}
+                >
+                  {item.name}
+                </Button>
+              ))
+            }
+          </Box>
+        )}
+
+        {token && (
           <>
-            <Typography variant="h6" component={Link} to="/dashboard">
-              Blog Dashboard
-            </Typography>
             <Button
               color="inherit"
               component={Link}
@@ -55,41 +93,6 @@ function Navbar() {
             >
               Logout
             </Button>
-          </>
-        ) : (
-          <>
-            <Typography variant="h6" component={Link} to="/" color={'white'} fontWeight={'bold'}>
-              DalVacationHome
-            </Typography>
-            <Button
-              color="inherit"
-              component={Link}
-              to="/"
-              sx={{ ml: 2 }}
-            >
-              Home
-            </Button>
-            <Button
-              color="inherit"
-              component={Link}
-              to="/signup"
-              sx={{ ml: 2 }}
-            >
-              Signup
-            </Button>
-          {
-            authentication.map((item) => (
-              <Button
-                color="inherit"
-                component={Link}
-                onClick={handleLogout}
-                to={item.name === "Login" ? "/login" : "/"}
-                sx={{ ml: 2 }}
-              >
-                {item.name}
-              </Button>
-            ))
-          }
           </>
         )}
       </Toolbar>
