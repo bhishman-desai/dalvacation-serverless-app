@@ -27,7 +27,7 @@ function SecurityQuestions() {
   const handleNext = async (event) => {
     try {
       const response = await axios.post(
-        "https://1p6eeibot0.execute-api.us-east-1.amazonaws.com/test/store-question",
+        process.env.REACT_APP_SIGNUP_SECURITY_QUESTION,
         {
           username: username,
           answers: answer,

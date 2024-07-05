@@ -25,13 +25,14 @@ function Signup() {
     e.preventDefault();
     try {
       const response = await axios.post(
-        "https://g3uez99le1.execute-api.us-east-1.amazonaws.com/test/signup",
+        process.env.REACT_APP_SIGNUP_URL,
         { username, name, email, password, role }
       );
       localStorage.setItem("username", username);
       console.log("Signup Response", response);
       if (response.status === 200) {
         navigate("/confirm/signup");
+        localStorage.setItem("loggedIn", true);
       }
     } catch (error) {
       console.log("Error", error);

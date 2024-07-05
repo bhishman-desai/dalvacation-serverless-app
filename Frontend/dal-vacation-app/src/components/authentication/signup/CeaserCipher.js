@@ -19,7 +19,7 @@ const CeaserCipher = () => {
     e.preventDefault();
     try {
       const response = await axios.post(
-        "https://i8k070tt31.execute-api.us-east-1.amazonaws.com/test/store-key",
+        process.env.REACT_APP_SIGNUP_CEASER_CYPHER,
         { username: username, key }
       );
       console.log("Cypher: ", response);

@@ -22,7 +22,7 @@ function GetSecurityQuestion() {
     const retrieveQuestion = async () => {
       try {
         const response = await axios.post(
-          "https://qlsq2aodbk.execute-api.us-east-1.amazonaws.com/test/login-security",
+          process.env.REACT_APP_GET_SECURITY_QUESTION,
           {
             username: username,
           }

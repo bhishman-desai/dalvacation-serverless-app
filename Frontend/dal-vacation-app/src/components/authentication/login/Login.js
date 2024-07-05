@@ -12,17 +12,18 @@ function Login() {
     e.preventDefault();
     try {
       const response = await axios.post(
-        "https://srrvb5807g.execute-api.us-east-1.amazonaws.com/login-test/login-user",
+        process.env.REACT_APP_LOGIN_URL,
         {
           username,
           password
         }
       )
       console.log("Login Response", response);
-      if (response.status === 200) {
+      if (response.data.statusCode === 200) {
         // localStorage.setItem("token", response.data.token);
         // localStorage.setItem("email", response.data.email);
         navigate("/login/security-question");
+        localStorage.setItem("loggedIn", true);
       }
     } catch (error) {
       console.log("Error", error);
@@ -67,6 +68,7 @@ function Login() {
             onChange={(e) => setPassword(e.target.value)}
             required
           />
+          
           <Button
             type="submit"
             variant="contained"
