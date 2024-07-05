@@ -6,10 +6,27 @@ import { useNavigate } from "react-router-dom";
 function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const navigate = useNavigate()
+  const [usernameError, setUsernameError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [loginError, setLoginError] = useState("");
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    let valid = true;
+
+    if (!username) {
+      setUsernameError("Username cannot be empty.");
+      valid = false;
+    }
+
+    if (!password) {
+      setPasswordError("Password cannot be empty.");
+      valid = false;
+    }
+
+    if (!valid) return;
+
     try {
       const response = await axios.post(
         process.env.REACT_APP_LOGIN_URL,
@@ -17,16 +34,29 @@ function Login() {
           username,
           password
         }
-      )
+      );
       console.log("Login Response", response);
       if (response.data.statusCode === 200) {
-        // localStorage.setItem("token", response.data.token);
-        // localStorage.setItem("email", response.data.email);
         navigate("/login/security-question");
         localStorage.setItem("loggedIn", true);
       }
     } catch (error) {
       console.log("Error", error);
+      setLoginError("Login failed. Please check your username and password.");
+    }
+  };
+
+  const handleUsernameChange = (e) => {
+    setUsername(e.target.value);
+    if (e.target.value) {
+      setUsernameError("");
+    }
+  };
+
+  const handlePasswordChange = (e) => {
+    setPassword(e.target.value);
+    if (e.target.value) {
+      setPasswordError("");
     }
   };
 
@@ -47,16 +77,22 @@ function Login() {
         <Typography variant="h4" component="h2" gutterBottom>
           Login
         </Typography>
+        {loginError && (
+          <Typography color="error" gutterBottom>
+            {loginError}
+          </Typography>
+        )}
         <form onSubmit={handleSubmit}>
           <TextField
-            label="username"
+            label="Username"
             type="text"
             variant="outlined"
             fullWidth
             margin="normal"
             value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            required
+            onChange={handleUsernameChange}
+            error={Boolean(usernameError)}
+            helperText={usernameError}
           />
           <TextField
             label="Password"
@@ -65,8 +101,9 @@ function Login() {
             fullWidth
             margin="normal"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
+            onChange={handlePasswordChange}
+            error={Boolean(passwordError)}
+            helperText={passwordError}
           />
           
           <Button

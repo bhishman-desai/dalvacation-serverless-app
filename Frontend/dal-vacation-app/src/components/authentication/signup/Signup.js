@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   Container,
   TextField,
@@ -19,23 +19,78 @@ function Signup() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("User");
+  const [usernameError, setUsernameError] = useState("");
+  const [nameError, setNameError] = useState("");
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [signupError, setSignupError] = useState("");
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    let valid = true;
+
+    if (!name) {
+      setNameError("Name cannot be empty.");
+      valid = false;
+    }
+    if (!username) {
+      setUsernameError("Username cannot be empty.");
+      valid = false;
+    }
+    if (!email) {
+      setEmailError("Email cannot be empty.");
+      valid = false;
+    }
+    if (!password) {
+      setPasswordError("Password cannot be empty.");
+      valid = false;
+    }
+
+    if (!valid) return;
+
     try {
       const response = await axios.post(
         process.env.REACT_APP_SIGNUP_URL,
         { username, name, email, password, role }
       );
-      localStorage.setItem("username", username);
       console.log("Signup Response", response);
       if (response.status === 200) {
-        navigate("/confirm/signup");
+        localStorage.setItem("username", username);
         localStorage.setItem("loggedIn", true);
+        navigate("/confirm/signup");
       }
     } catch (error) {
       console.log("Error", error);
+      setSignupError("Signup failed. Please check your details and try again.");
+    }
+  };
+
+  const handleNameChange = (e) => {
+    setName(e.target.value);
+    if (e.target.value) {
+      setNameError("");
+    }
+  };
+
+  const handleUsernameChange = (e) => {
+    setUsername(e.target.value);
+    if (e.target.value) {
+      setUsernameError("");
+    }
+  };
+
+  const handleEmailChange = (e) => {
+    setEmail(e.target.value);
+    if (e.target.value) {
+      setEmailError("");
+    }
+  };
+
+  const handlePasswordChange = (e) => {
+    setPassword(e.target.value);
+    if (e.target.value) {
+      setPasswordError("");
     }
   };
 
@@ -58,12 +113,17 @@ function Signup() {
           overflow: "auto",
           "&::-webkit-scrollbar": {
             width: 0,
-          }, // hide scrollbar
+          },
         }}
       >
         <Typography variant="h5" component="h2" gutterBottom>
           Signup
         </Typography>
+        {signupError && (
+          <Typography color="error" gutterBottom>
+            {signupError}
+          </Typography>
+        )}
         <form onSubmit={handleSubmit}>
           <TextField
             label="Name"
@@ -71,15 +131,16 @@ function Signup() {
             fullWidth
             margin="dense"
             value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
+            onChange={handleNameChange}
+            error={Boolean(nameError)}
+            helperText={nameError}
             sx={{
               marginBottom: 1,
               "& .MuiInputLabel-root": {
-                fontSize: 14, // reduced label font size
+                fontSize: 14,
               },
               "& .MuiInputBase-root": {
-                fontSize: 14, // reduced input font size
+                fontSize: 14, 
               },
             }}
           />
@@ -90,8 +151,9 @@ function Signup() {
             margin="dense"
             placeholder="Enter your email address as username"
             value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            required
+            onChange={handleUsernameChange}
+            error={Boolean(usernameError)}
+            helperText={usernameError}
             sx={{
               marginBottom: 1,
               "& .MuiInputLabel-root": {
@@ -109,8 +171,9 @@ function Signup() {
             fullWidth
             margin="dense"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
+            onChange={handleEmailChange}
+            error={Boolean(emailError)}
+            helperText={emailError}
             sx={{
               marginBottom: 1,
               "& .MuiInputLabel-root": {
@@ -128,8 +191,10 @@ function Signup() {
             fullWidth
             margin="dense"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
+            onChange={handlePasswordChange}
+            error={Boolean(passwordError)}
+            helperText={passwordError}
+            // required
             sx={{
               marginBottom: 1,
               "& .MuiInputLabel-root": {
@@ -174,7 +239,7 @@ function Signup() {
               "&:hover": {
                 backgroundColor: "primary.dark",
               },
-              fontSize: 14, // reduced button font size
+              fontSize: 14,
             }}
           >
             Signup

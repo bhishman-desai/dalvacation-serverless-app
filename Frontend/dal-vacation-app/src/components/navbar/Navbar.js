@@ -4,8 +4,6 @@ import {
   Toolbar,
   Typography,
   Button,
-  IconButton,
-  MenuItem,
 } from "@mui/material";
 
 function Navbar() {
