@@ -7,7 +7,7 @@ resource "google_service_account" "account" {
 resource "google_storage_bucket_object" "function_zip" {
   name   = "function.zip"
   bucket = google_storage_bucket.function_bucket.name
-  source = "./function_code/function.zip"
+  source = "./cloud_function/function.zip"
 }
 
 resource "google_cloudfunctions2_function" "complaint_function" {
@@ -36,7 +36,7 @@ resource "google_cloudfunctions2_function" "complaint_function" {
     max_instance_request_concurrency = 80
     available_cpu = "4"
     environment_variables = {
-      PROPERTY_AGENTS = "bpdatal5@gmail.com"
+      PROPERTY_AGENTS = "bpdatal5@gmail.com, bhishman@dal.ca"
     }
     ingress_settings = "ALLOW_INTERNAL_ONLY"
     all_traffic_on_latest_revision = true

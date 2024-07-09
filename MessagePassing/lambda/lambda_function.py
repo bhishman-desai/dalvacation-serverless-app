@@ -15,7 +15,22 @@ topic_path = publisher.topic_path(project_id, topic_id)
 
 def lambda_handler(event, context):
     """Lambda function to publish message to Pub/Sub."""
-    message = event.get('body')
+    if 'body' in event:
+        event_body = event['body']
+        if isinstance(event_body, str):
+            message = json.loads(event_body).get('body')
+        elif isinstance(event_body, dict):
+            message = event_body
+        else:
+            return {
+                'statusCode': 400,
+                'body': json.dumps('Invalid message format.')
+            }
+    else:
+        return {
+            'statusCode': 400,
+            'body': json.dumps('Message body not found.')
+        }
 
     if not message:
         return {
@@ -24,6 +39,7 @@ def lambda_handler(event, context):
         }
 
     data = json.dumps(message).encode('utf-8')
+
     try:
         future = publisher.publish(topic_path, data)
         message_id = future.result()
