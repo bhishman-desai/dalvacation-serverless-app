@@ -1,9 +1,14 @@
 /* CONSUMER */
 const functions = require('@google-cloud/functions-framework');
-const { Firestore } = require('@google-cloud/firestore');
 
 /* Initialize Firestore client */
-const firestore = new Firestore();
+const { initializeApp, applicationDefault, cert } = require('firebase-admin/app');
+const { getFirestore, Timestamp, FieldValue, Filter } = require('firebase-admin/firestore');
+initializeApp();
+
+/* Use Firestore with REST */
+const db = getFirestore();
+db.settings({ preferRest: true });
 
 functions.cloudEvent('forwardComplaint', async (cloudEvent) => {
     const message = Buffer.from(cloudEvent.data.message.data, 'base64').toString();
@@ -18,14 +23,18 @@ functions.cloudEvent('forwardComplaint', async (cloudEvent) => {
 
     /* Add a log entry to Firestore */
     try {
-        await firestore.collection('complaint_logs').add({
+        await db.collection('complaint_logs').add({
             clientId: parsedMessage.clientId,
             agentId: chosenAgent,
             message: parsedMessage.complaint,
-            timestamp: Firestore.FieldValue.serverTimestamp(),
+            timestamp: FieldValue.serverTimestamp(),
         });
         console.log('Complaint logged successfully.');
     } catch (error) {
-        console.error('Error logging complaint: ', error);
+        if (error.code === 5) {
+            console.error('NOT_FOUND error: The specified collection or document does not exist.');
+        } else {
+            console.error('Error logging complaint: ', error);
+        }
     }
 });

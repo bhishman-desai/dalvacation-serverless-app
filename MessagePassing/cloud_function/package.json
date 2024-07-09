@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "@google-cloud/firestore": "^7.9.0",
-    "@google-cloud/functions-framework": "^3.0.0"
+    "@google-cloud/functions-framework": "^3.0.0",
+    "firebase-admin": "^12.2.0"
   }
 }
