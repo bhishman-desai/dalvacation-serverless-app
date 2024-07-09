@@ -2,13 +2,11 @@
 const functions = require('@google-cloud/functions-framework');
 
 /* Initialize Firestore client */
-const { initializeApp, applicationDefault, cert } = require('firebase-admin/app');
-const { getFirestore, Timestamp, FieldValue, Filter } = require('firebase-admin/firestore');
-initializeApp();
-
-/* Use Firestore with REST */
-const db = getFirestore();
-db.settings({ preferRest: true });
+const admin = require('firebase-admin');
+const serviceAccount = require("./serverless-426417-cf96236756bb.json");
+admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount)
+});
 
 functions.cloudEvent('forwardComplaint', async (cloudEvent) => {
     const message = Buffer.from(cloudEvent.data.message.data, 'base64').toString();
@@ -23,11 +21,11 @@ functions.cloudEvent('forwardComplaint', async (cloudEvent) => {
 
     /* Add a log entry to Firestore */
     try {
-        await db.collection('complaint_logs').add({
+        await admin.firestore().collection('complaint_logs').add({
             clientId: parsedMessage.clientId,
             agentId: chosenAgent,
             message: parsedMessage.complaint,
-            timestamp: FieldValue.serverTimestamp(),
+            timestamp: admin.firestore.FieldValue.serverTimestamp(),
         });
         console.log('Complaint logged successfully.');
     } catch (error) {

@@ -1,7 +1,7 @@
 /* Module to create Firestore index for logging complaints */
 resource "google_firestore_database" "database" {
   project     = var.project_id
-  name        = "pubsub"
+  name        = "(default)"
   location_id = var.location_id
   type        = "FIRESTORE_NATIVE"
 
