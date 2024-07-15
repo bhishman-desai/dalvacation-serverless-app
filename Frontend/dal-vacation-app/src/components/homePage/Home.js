@@ -131,7 +131,7 @@ const Home = () => {
                     <Typography variant="body1" gutterBottom>
                         Discover your perfect getaway with DalVacationHome. Our meticulously curated selection of vacation rentals offers a diverse range of options, from cozy cabins to luxurious beachfront villas. Whether you're planning a romantic weekend, a family reunion, or a solo retreat, DalVacationHome provides the ideal accommodation to meet your needs.
 
-                        At DalVacationHome, we believe that your vacation experience should be exceptional from start to finish. Our properties are handpicked to ensure the highest standards of comfort, style, and convenience. Enjoy breathtaking views, modern amenities, and personalized services that make every stay unforgettable.
+                        At DalVacationHome, we believe that your vacation experience should be exceptional from start to finish. Our properties are handpicked to ensure the highest standards of comfort, style, and convenience. Enjoy breathtaking views, modern amenities, and personalized services that make every stay unforgettable
 
                     </Typography>
                 </Grid>
