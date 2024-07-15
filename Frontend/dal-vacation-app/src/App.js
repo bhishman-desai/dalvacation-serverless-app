@@ -10,6 +10,7 @@ import GetSecurityQuestion from './components/authentication/login/GetSecurityQu
 import LoginCeaserCypher from './components/authentication/login/LoginCeaserCypher';
 import Footer from './components/footer/Footer';
 import Home from './components/homePage/Home';
+import ExploreRooms from "./components/ExploreRooms";
 import Reviews from './components/reviews/Reviews';
 import Dashboard from './components/admin/Dashboard';
 function App() {
@@ -26,6 +27,7 @@ function App() {
         <Route path='/signup/ceaser-cypher' element={<CeaserCipher/>} />
         <Route path='/login/security-question' element={<GetSecurityQuestion/>} />
         <Route path='/login/ceaser-cypher' element={<LoginCeaserCypher/>} />
+        <Route path='/login/explore-rooms' element={<ExploreRooms/>}/>
         <Route path='/admin/dashboard' element={<Dashboard/>} />
       </Routes>
       <Reviews/>
