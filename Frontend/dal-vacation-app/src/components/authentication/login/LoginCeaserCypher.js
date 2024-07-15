@@ -76,10 +76,8 @@ function LoginCeaserCypher() {
 
   const submitHandler = async (e) => {
     e.preventDefault();
-    console.log(answer);
-    console.log(caesarCipher(string, cypherKey));
-    if (answer === caesarCipher(string, cypherKey)) {
-      navigate("/");
+    if (answer === correctAnswer) {
+      navigate("/login/explore-rooms");
       console.log("Answer is correct. Moving to the next step.");
     } else {
       setError("Incorrect answer. Please try again.");

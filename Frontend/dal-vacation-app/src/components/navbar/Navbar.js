@@ -30,7 +30,7 @@ function Navbar() {
   return (
     <AppBar position="static" color="primary">
       <Toolbar sx={{ justifyContent: 'space-between' }}>
-        <Typography variant="h6" component={Link} to="/" color={'white'} fontWeight={'bold'}>
+        <Typography variant="h4" component={Link} to="/" color={'white'} fontWeight={'bold'}>
           DalVacationHome
         </Typography>
 
