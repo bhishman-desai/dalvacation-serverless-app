@@ -44,14 +44,16 @@ function Navbar() {
             >
               Home
             </Button>
-            <Button
-              color="inherit"
-              component={Link}
-              to="/signup"
-              sx={{ ml: 2 }}
-            >
-              Signup
-            </Button>
+            {
+              isLoggedIn ? ("") : (<Button
+                color="inherit"
+                component={Link}
+                to="/signup"
+                sx={{ ml: 2 }}
+              >
+                Signup
+              </Button>)
+            }
             {
               authentication.map((item) => (
                 <Button
