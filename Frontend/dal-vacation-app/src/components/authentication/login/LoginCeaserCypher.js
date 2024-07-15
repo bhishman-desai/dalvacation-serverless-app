@@ -79,7 +79,7 @@ function LoginCeaserCypher() {
     console.log(answer);
     console.log(caesarCipher(string, cypherKey));
     if (answer === caesarCipher(string, cypherKey)) {
-      navigate("/");
+      navigate("/login/explore-rooms");
       console.log("Answer is correct. Moving to the next step.");
     } else {
       setError("Incorrect answer. Please try again.");
@@ -100,9 +100,6 @@ function LoginCeaserCypher() {
                 </Typography>
               <Typography variant="body1" gutterBottom>
                 Random String: {string}
-              </Typography>
-              <Typography variant="body1" gutterBottom>
-                Your key is: {cypherKey}
               </Typography>
               <TextField
                 label="Your Answer"
