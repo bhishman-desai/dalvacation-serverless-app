@@ -11,6 +11,7 @@ import LoginCeaserCypher from './components/authentication/login/LoginCeaserCyph
 import Footer from './components/footer/Footer';
 import Home from './components/homePage/Home';
 import Reviews from './components/reviews/Reviews';
+import Dashboard from './components/admin/Dashboard';
 function App() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
@@ -25,6 +26,7 @@ function App() {
         <Route path='/signup/ceaser-cypher' element={<CeaserCipher/>} />
         <Route path='/login/security-question' element={<GetSecurityQuestion/>} />
         <Route path='/login/ceaser-cypher' element={<LoginCeaserCypher/>} />
+        <Route path='/admin/dashboard' element={<Dashboard/>} />
       </Routes>
       <Reviews/>
       <Footer/>
