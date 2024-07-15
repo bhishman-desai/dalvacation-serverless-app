@@ -24,7 +24,7 @@ const CeaserCipher = () => {
       );
       console.log("Cypher: ", response);
       if (response.status === 200) {
-        navigate("/");
+        navigate("/login");
       }
 
       const confirmUser = await axios.post('https://m21jpbf7qb.execute-api.us-east-1.amazonaws.com/test/confirm-user', {
