@@ -10,6 +10,7 @@ import GetSecurityQuestion from './components/authentication/login/GetSecurityQu
 import LoginCeaserCypher from './components/authentication/login/LoginCeaserCypher';
 import Footer from './components/footer/Footer';
 import Home from './components/homePage/Home';
+import Reviews from './components/reviews/Reviews';
 function App() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
@@ -25,6 +26,7 @@ function App() {
         <Route path='/login/security-question' element={<GetSecurityQuestion/>} />
         <Route path='/login/ceaser-cypher' element={<LoginCeaserCypher/>} />
       </Routes>
+      <Reviews/>
       <Footer/>
     </Router>
     </div>
