@@ -55,7 +55,7 @@ function LoginCeaserCypher() {
   const submitHandler = async (e) => {
     e.preventDefault();
     if (answer === correctAnswer) {
-      navigate("/");
+      navigate("/login/explore-rooms");
       console.log("Answer is correct. Moving to the next step.");
     } else {
       setError("Incorrect answer. Please try again.");
