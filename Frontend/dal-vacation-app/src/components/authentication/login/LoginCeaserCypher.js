@@ -76,7 +76,9 @@ function LoginCeaserCypher() {
 
   const submitHandler = async (e) => {
     e.preventDefault();
-    if (answer === correctAnswer) {
+    console.log(answer);
+    console.log(caesarCipher(string, cypherKey));
+    if (answer === caesarCipher(string, cypherKey)) {
       navigate("/login/explore-rooms");
       console.log("Answer is correct. Moving to the next step.");
     } else {
@@ -98,9 +100,6 @@ function LoginCeaserCypher() {
                 </Typography>
               <Typography variant="body1" gutterBottom>
                 Random String: {string}
-              </Typography>
-              <Typography variant="body1" gutterBottom>
-                Your key is: {cypherKey}
               </Typography>
               <TextField
                 label="Your Answer"
