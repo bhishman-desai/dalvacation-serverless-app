@@ -11,7 +11,6 @@ import LoginCeaserCypher from './components/authentication/login/LoginCeaserCyph
 import Footer from './components/footer/Footer';
 import Home from './components/homePage/Home';
 import ExploreRooms from "./components/ExploreRooms";
-import Reviews from './components/reviews/Reviews';
 import Dashboard from './components/admin/Dashboard';
 function App() {
   return (
@@ -30,7 +29,6 @@ function App() {
         <Route path='/login/explore-rooms' element={<ExploreRooms/>}/>
         <Route path='/admin/dashboard' element={<Dashboard/>} />
       </Routes>
-      <Reviews/>
       <Footer/>
     </Router>
     </div>

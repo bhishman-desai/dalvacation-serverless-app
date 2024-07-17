@@ -1,5 +1,6 @@
 import React from 'react';
 import {Container, Grid, Typography, Card, CardContent, CardMedia, Box, Divider, Button} from '@mui/material';
+import Reviews from '../reviews/Reviews';
 
 const dummyRooms = [
     {
@@ -114,6 +115,7 @@ const companyLogos = [
 
 const Home = () => {
     return (
+        <>
         <Container>
             {/* Welcome Section */}
             <Grid container spacing={2} alignItems="center" justifyContent="center" sx={{ minHeight: 'calc(100vh - 64px)', width: '100%' }}>
@@ -186,6 +188,8 @@ const Home = () => {
                 ))}
             </Grid>
         </Container>
+        <Reviews/>
+        </>
     );
 };
 

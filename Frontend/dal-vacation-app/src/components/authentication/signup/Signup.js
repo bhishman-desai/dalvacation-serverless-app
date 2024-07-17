@@ -55,7 +55,7 @@ function Signup() {
         { username, name, email, password, role }
       );
       console.log("Signup Response", response);
-      if (response.status === 200) {
+      if (response.data.statusCode === 200) {
         localStorage.setItem("username", username);
         localStorage.setItem("loggedIn", true);
         navigate("/confirm/signup");

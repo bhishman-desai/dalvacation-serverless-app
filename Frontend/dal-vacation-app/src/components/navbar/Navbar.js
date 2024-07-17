@@ -23,6 +23,7 @@ function Navbar() {
     localStorage.removeItem("email");
     if(isLoggedIn) {
       localStorage.removeItem("loggedIn");
+      localStorage.removeItem("username");
     }
     navigate("/");
   };
