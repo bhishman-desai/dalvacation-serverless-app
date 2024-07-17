@@ -12,23 +12,25 @@ import { useNavigate } from "react-router-dom";
 
 const CeaserCipher = () => {
   const [key, setKey] = useState("");
-  const username = localStorage.getItem("username");
+  const userId = localStorage.getItem('userId');
+  const userEmail = localStorage.getItem('userEmail');
   const navigate = useNavigate();
+  console.log(userEmail)
 
   const submitHandler = async (e) => {
     e.preventDefault();
     try {
       const response = await axios.post(
         process.env.REACT_APP_SIGNUP_CEASER_CYPHER,
-        { username: username, key }
+        { id: parseInt(userId), key }
       );
       console.log("Cypher: ", response);
-      if (response.status === 200) {
-        navigate("/login");
-      }
+      // if (response.status === 200) {
+      //   navigate("/login");
+      // }
 
-      const confirmUser = await axios.post('https://m21jpbf7qb.execute-api.us-east-1.amazonaws.com/test/confirm-user', {
-        username: username
+      const confirmUser = await axios.post("https://zrgk02vc95.execute-api.us-east-1.amazonaws.com/DalVacation/auth/confirmUser", {
+        username: userEmail
       })
 
         console.log("Confirm User: ", confirmUser);

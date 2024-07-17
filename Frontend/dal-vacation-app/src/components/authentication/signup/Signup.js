@@ -15,12 +15,12 @@ import axios from "axios";
 
 function Signup() {
   const [username, setUsername] = useState("");
-  const [name, setName] = useState("");
+  // const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("User");
   const [usernameError, setUsernameError] = useState("");
-  const [nameError, setNameError] = useState("");
+  // const [nameError, setNameError] = useState("");
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [signupError, setSignupError] = useState("");
@@ -30,10 +30,10 @@ function Signup() {
     e.preventDefault();
     let valid = true;
 
-    if (!name) {
-      setNameError("Name cannot be empty.");
-      valid = false;
-    }
+    // if (!name) {
+    //   setNameError("Name cannot be empty.");
+    //   valid = false;
+    // }
     if (!username) {
       setUsernameError("Username cannot be empty.");
       valid = false;
@@ -52,12 +52,12 @@ function Signup() {
     try {
       const response = await axios.post(
         process.env.REACT_APP_SIGNUP_URL,
-        { username, name, email, password, role }
+        { username, email, password, role }
       );
       console.log("Signup Response", response);
-      if (response.status === 200) {
-        localStorage.setItem("username", username);
-        localStorage.setItem("loggedIn", true);
+      if (response.data.statusCode === 200) {
+        localStorage.setItem("userEmail", email);
+        localStorage.setItem("userId", response.data.userId);
         navigate("/confirm/signup");
       }
     } catch (error) {
@@ -66,12 +66,12 @@ function Signup() {
     }
   };
 
-  const handleNameChange = (e) => {
-    setName(e.target.value);
-    if (e.target.value) {
-      setNameError("");
-    }
-  };
+  // const handleNameChange = (e) => {
+  //   setName(e.target.value);
+  //   if (e.target.value) {
+  //     setNameError("");
+  //   }
+  // };
 
   const handleUsernameChange = (e) => {
     setUsername(e.target.value);
@@ -122,7 +122,7 @@ function Signup() {
           </Typography>
         )}
         <form onSubmit={handleSubmit}>
-          <TextField
+          {/* <TextField
             label="Name"
             variant="outlined"
             fullWidth
@@ -140,7 +140,7 @@ function Signup() {
                 fontSize: 14, 
               },
             }}
-          />
+          /> */}
           <TextField
             label="Username"
             variant="outlined"

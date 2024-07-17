@@ -14,7 +14,7 @@ function SecurityQuestions() {
   const [selectedQuestion, setSelectedQuestion] = useState(questions[0]);
   const [answer, setAnswer] = useState('');
   const navigate = useNavigate()
-  const username = localStorage.getItem('username');
+  const userId = localStorage.getItem('userId');
 
   const handleQuestionChange = (event) => {
     setSelectedQuestion(event.target.value);
@@ -29,13 +29,13 @@ function SecurityQuestions() {
       const response = await axios.post(
         process.env.REACT_APP_SIGNUP_SECURITY_QUESTION,
         {
-          username: username,
+          id: parseInt(userId),
           answers: answer,
           question: selectedQuestion
         }
       );
       console.log("Security Response", response);
-      if (response.status === 200) {
+      if (response.data.statusCode === 200) {
         navigate("/signup/ceaser-cypher");
       }
     } catch (error) {

@@ -2,6 +2,12 @@ import React, { useState } from "react";
 import { Container, TextField, Button, Typography, Box } from "@mui/material";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import {
+  CognitoUser,
+  AuthenticationDetails,
+  CognitoUserPool,
+} from "amazon-cognito-identity-js";
+import AWS from "aws-sdk";
 
 function Login() {
   const [username, setUsername] = useState("");
@@ -10,6 +16,60 @@ function Login() {
   const [passwordError, setPasswordError] = useState("");
   const [loginError, setLoginError] = useState("");
   const navigate = useNavigate();
+
+  const auth = () => {
+    const poolData = {
+      UserPoolId: "us-east-1_x1sxS2NLA",
+      ClientId: "3asm0dioqbmn32lh0vie0lcecb",
+    };
+
+    const userPool = new CognitoUserPool(poolData);
+
+    const authenticationDetails = new AuthenticationDetails({
+      Username: username,
+      Password: password,
+    });
+
+    const userData = {
+      Username: username,
+      Pool: userPool,
+    };
+
+    const cognitoUser = new CognitoUser(userData);
+
+    cognitoUser.authenticateUser(authenticationDetails, {
+      onSuccess: (result) => {
+        console.log("Access token: " + result.getAccessToken().getJwtToken());
+        localStorage.setItem("accessToken", result.getAccessToken().getJwtToken());
+      },
+      onFailure: (err) => {
+        console.log(err);
+        alert("Incorrect Username")
+      },
+    });
+  };
+
+  const session = () => {
+    AWS.config.update({
+      region: "us-east-1", // Your AWS region here
+    });
+    const cognitoISP = new AWS.CognitoIdentityServiceProvider();
+
+    // Get user session details
+    cognitoISP.getUser(
+      {
+        AccessToken:
+          localStorage.getItem("accessToken")
+      },
+      (err, data) => {
+        if (err) {
+          console.error("Error getting user details:", err);
+        } else {
+          console.log("User session details:", data);
+        }
+      }
+    );
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -28,18 +88,19 @@ function Login() {
     if (!valid) return;
 
     try {
-      const response = await axios.post(
-        process.env.REACT_APP_LOGIN_URL,
-        {
-          username,
-          password
-        }
-      );
-      console.log("Login Response", response);
-      if (response.data.statusCode === 200) {
-        navigate("/login/security-question");
-        localStorage.setItem("loggedIn", true);
-      }
+      auth();
+      // const response = await axios.post(
+      //   process.env.REACT_APP_LOGIN_URL,
+      //   {
+      //     username,
+      //     password
+      //   }
+      // );
+      // console.log("Login Response", response);
+      // if (response.data.statusCode === 200) {
+      //   navigate("/login/security-question");
+      //   localStorage.setItem("loggedIn", true);
+      // }
     } catch (error) {
       console.log("Error", error);
       setLoginError("Login failed. Please check your username and password.");
@@ -84,7 +145,7 @@ function Login() {
         )}
         <form onSubmit={handleSubmit}>
           <TextField
-            label="Username"
+            label="Email"
             type="text"
             variant="outlined"
             fullWidth
