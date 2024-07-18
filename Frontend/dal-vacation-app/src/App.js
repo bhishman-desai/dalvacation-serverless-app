@@ -15,6 +15,7 @@ import Reviews from './components/reviews/Reviews';
 import Dashboard from './components/admin/Dashboard';
 import KommunicateChat from "./components/ChatBot/Chabot";
 
+
 function App() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
