@@ -29,10 +29,10 @@ resource "google_cloudbuild_trigger" "github_trigger" {
   /* Service Account */
   service_account = google_service_account.default.name
 
-  /* GitHub Config TODO: Change this to dalvacation-serverless-app */
+  /* GitHub Config */
   github {
     owner = "bhishman-desai"
-    name  = "5410-Serverless"
+    name  = "dalvacation-serverless-app"
     push {
       branch = "^main$"
     }
@@ -99,7 +99,7 @@ resource "google_cloud_run_v2_service" "dal_vacation_service" {
         container_port = 80
       }
 
-      /* Environment Variables TODO: Change according to need later */
+      /* Environment Variables */
       env {
         name  = "FOO"
         value = "bar"
