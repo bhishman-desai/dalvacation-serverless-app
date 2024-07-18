@@ -20,7 +20,7 @@ const generateRandomString = (length) => {
   }
 
   return result;
-}
+};
 
 function LoginCeaserCypher() {
   const [cypherKey, setCypherKey] = useState("");
@@ -52,9 +52,33 @@ function LoginCeaserCypher() {
     retrieveQuestion();
   }, [username]);
 
+  const caesarCipher = (str, key) => {
+    const shift = key % 26;
+    let result = "";
+
+    for (let i = 0; i < str.length; i++) {
+      let char = str[i];
+      if (char.match(/[a-z]/i)) {
+        const code = str.charCodeAt(i);
+
+        if (code >= 65 && code <= 90) {
+          char = String.fromCharCode(((code - 65 + shift) % 26) + 65);
+        }
+        else if (code >= 97 && code <= 122) {
+          char = String.fromCharCode(((code - 97 + shift) % 26) + 97);
+        }
+      }
+      result += char;
+    }
+
+    return result;
+  };
+
   const submitHandler = async (e) => {
     e.preventDefault();
-    if (answer === correctAnswer) {
+    console.log(answer);
+    console.log(caesarCipher(string, cypherKey));
+    if (answer === caesarCipher(string, cypherKey)) {
       navigate("/login/explore-rooms");
       console.log("Answer is correct. Moving to the next step.");
     } else {
@@ -63,23 +87,19 @@ function LoginCeaserCypher() {
   };
 
   return (
-    <Container maxWidth="sm">
-      <Box
-        display="flex"
-        alignItems="center"
-        minHeight="60vh"
-      >
+    <Container maxWidth="lg">
+      <Box display="flex" alignItems="center" minHeight="60vh">
         <Paper elevation={3} sx={{ p: 4, width: "100%" }}>
           <Typography variant="h4" component="h1" gutterBottom align="center">
             Caesar Cypher
           </Typography>
           {cypherKey ? (
             <form onSubmit={submitHandler}>
+              <Typography variant="caption" gutterBottom>
+              for eg: If the random string is "HELLO" and the cypher key is 3, you should decrypt the string as (H + 3) (E + 3) (L + 3) (L + 3) (O + 3) which gives you "KHOOR". 
+                </Typography>
               <Typography variant="body1" gutterBottom>
                 Random String: {string}
-              </Typography>
-              <Typography variant="body1" gutterBottom>
-                Enter this key to decypher: {cypherKey}
               </Typography>
               <TextField
                 label="Your Answer"

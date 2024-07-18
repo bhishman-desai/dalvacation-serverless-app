@@ -10,12 +10,11 @@ import GetSecurityQuestion from './components/authentication/login/GetSecurityQu
 import LoginCeaserCypher from './components/authentication/login/LoginCeaserCypher';
 import Footer from './components/footer/Footer';
 import Home from './components/homePage/Home';
-import RoomBooking from "./components/ExploreRooms";
-import login from "./components/authentication/login/Login";
 import ExploreRooms from "./components/ExploreRooms";
 import Reviews from './components/reviews/Reviews';
 import Dashboard from './components/admin/Dashboard';
 import KommunicateChat from "./components/ChatBot/Chabot";
+
 function App() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
@@ -31,7 +30,9 @@ function App() {
         <Route path='/login/security-question' element={<GetSecurityQuestion/>} />
         <Route path='/login/ceaser-cypher' element={<LoginCeaserCypher/>} />
         <Route path='/login/explore-rooms' element={<ExploreRooms/>}/>
+        <Route path='/admin/dashboard' element={<Dashboard/>} />
       </Routes>
+      <Reviews/>
       <Footer/>
     </Router>
       <KommunicateChat/>
