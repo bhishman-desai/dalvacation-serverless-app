@@ -9,9 +9,11 @@ import {
   Paper,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import LoaderComponent from "../../utils/loader";
 
 const CeaserCipher = () => {
   const [key, setKey] = useState("");
+  const [loading, setLoading] = useState(false);
   const userId = localStorage.getItem('userId');
   const userEmail = localStorage.getItem('userEmail');
   const navigate = useNavigate();
@@ -20,31 +22,30 @@ const CeaserCipher = () => {
   const submitHandler = async (e) => {
     e.preventDefault();
     try {
+      setLoading(true);
       const response = await axios.post(
         process.env.REACT_APP_SIGNUP_CEASER_CYPHER,
         { id: parseInt(userId), key }
       );
       console.log("Cypher: ", response);
-      if (response.status === 200) {
-        navigate("/login");
-      }
-
+      
       const confirmUser = await axios.post("https://jmwefvfgih.execute-api.us-east-1.amazonaws.com/DalVacation/auth/confirmUser", {
         username: userEmail
       })
-
+      
+      console.log("Confirm User: ", confirmUser);
+      setLoading(false);
       if(confirmUser.data.statusCode === 200) {
         navigate("/login");
       }
-
-      console.log("Confirm User: ", confirmUser);
     } catch (err) {
       console.log(err);
     }
   };
 
   return (
-    <Container maxWidth="sm">
+    <>
+    {loading ? (<LoaderComponent/>) : (<Container maxWidth="sm">
       <Box
         display="flex"
         alignItems="center"
@@ -76,7 +77,8 @@ const CeaserCipher = () => {
           </form>
         </Paper>
       </Box>
-    </Container>
+    </Container>)}
+    </>
   );
 };
 

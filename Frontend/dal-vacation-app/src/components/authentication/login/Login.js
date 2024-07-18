@@ -10,6 +10,7 @@ import {
 import AWS from "aws-sdk";
 import { useUserStore } from "../../../store";
 import { session } from "../helper";
+import LoaderComponent from "../../utils/loader";
 
 function Login() {
   const [username, setUsername] = useState("");
@@ -17,65 +18,33 @@ function Login() {
   const [usernameError, setUsernameError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [loginError, setLoginError] = useState("");
+  const [loading, setLoading] = useState();
   const navigate = useNavigate();
 
   const { user, setUser } = useUserStore();
 
-  const auth = () => {
-    const poolData = {
-      UserPoolId: "us-east-1_x1sxS2NLA",
-      ClientId: "3asm0dioqbmn32lh0vie0lcecb",
-    };
-
-    const userPool = new CognitoUserPool(poolData);
-
-    const authenticationDetails = new AuthenticationDetails({
-      Username: username,
-      Password: password,
-    });
-
-    const userData = {
-      Username: username,
-      Pool: userPool,
-    };
-
-    const cognitoUser = new CognitoUser(userData);
-
-    cognitoUser.authenticateUser(authenticationDetails, {
-      onSuccess: (result) => {
-        // console.log("Access token: " + result.getAccessToken().getJwtToken());
-        localStorage.setItem("accessToken", result.getAccessToken().getJwtToken());
-      },
-      onFailure: (err) => {
-        console.log(err);
-        alert("Incorrect Username")
-      },
-    });
-  };
-
-
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     let valid = true;
-
+    
     if (!username) {
       setUsernameError("Username cannot be empty.");
       valid = false;
     }
-
+    
     if (!password) {
       setPasswordError("Password cannot be empty.");
       valid = false;
     }
-
+    
     if (!valid) return;
-
+    
+    setLoading(true);
+    console.log(true);
     try {
-      // const v = await session()
-      // console.log(v)
       const poolData = {
-        UserPoolId: "us-east-1_x1sxS2NLA",
-        ClientId: "3asm0dioqbmn32lh0vie0lcecb",
+        UserPoolId: process.env.REACT_APP_COGNITO_USERPOOL_ID,
+        ClientId: process.env.REACT_APP_COGNITO_CLIENT_ID,
       };
   
       const userPool = new CognitoUserPool(poolData);
@@ -91,25 +60,24 @@ function Login() {
       };
   
       const cognitoUser = new CognitoUser(userData);
+
   
       cognitoUser.authenticateUser(authenticationDetails, {
         onSuccess: async (result) => {
-          // console.log("Access token: " + result.getAccessToken().getJwtToken());
           localStorage.setItem("accessToken", result.getAccessToken().getJwtToken());
           const user = await session();
-          // console.log(user);
           setUser(user);
           navigate("/login/security-question");
         },
         onFailure: (err) => {
-          console.log(err);
           alert("Incorrect Username")
         },
       });
+
     } catch (error) {
-      console.log("Error", error);
       setLoginError("Login failed. Please check your username and password.");
     }
+    setLoading(false);
   };
 
   const handleUsernameChange = (e) => {
@@ -126,8 +94,8 @@ function Login() {
     }
   };
 
-  return (
-    <Container maxWidth="sm">
+  return (<>
+    {loading ? (<LoaderComponent/>) : (<Container maxWidth="sm">
       <Box
         sx={{
           marginTop: 4,
@@ -183,7 +151,8 @@ function Login() {
           </Button>
         </form>
       </Box>
-    </Container>
+    </Container>)}
+    </>
   );
 }
 

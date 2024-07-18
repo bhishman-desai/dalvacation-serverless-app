@@ -33,7 +33,6 @@ function LoginCeaserCypher() {
   const username = localStorage.getItem("username");
   const navigate = useNavigate();
   const { user } = useUserStore();
-  // console.log(user.id)
 
   useEffect(() => {
     if(!user){
@@ -47,13 +46,11 @@ function LoginCeaserCypher() {
             id: parseInt(user.id),
           }
         );
-        console.log("Login cypher response", response);
         const { body } = response.data;
         setCypherKey(parseInt(body));
         setCorrectAnswer(body);
       } catch (error) {
         setError("Error retrieving cypher key");
-        console.error(error);
       }
     };
     retrieveQuestion();
@@ -83,8 +80,6 @@ function LoginCeaserCypher() {
 
   const submitHandler = async (e) => {
     e.preventDefault();
-    console.log(answer);
-    console.log(caesarCipher(string, cypherKey));
     if (answer === caesarCipher(string, cypherKey)) {
       navigate("/login/explore-rooms");
       localStorage.setItem("userId", user.id);
@@ -98,7 +93,6 @@ function LoginCeaserCypher() {
 
   return (
     <Container maxWidth="lg">
-      <h2>{cypherKey}</h2>
       <Box display="flex" alignItems="center" minHeight="60vh">
         <Paper elevation={3} sx={{ p: 4, width: "100%" }}>
           <Typography variant="h4" component="h1" gutterBottom align="center">
