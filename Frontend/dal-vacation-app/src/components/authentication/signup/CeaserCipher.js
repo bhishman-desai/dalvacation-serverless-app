@@ -9,36 +9,43 @@ import {
   Paper,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import LoaderComponent from "../../utils/loader";
 
 const CeaserCipher = () => {
   const [key, setKey] = useState("");
-  const username = localStorage.getItem("username");
+  const [loading, setLoading] = useState(false);
+  const userId = localStorage.getItem('userId');
+  const userEmail = localStorage.getItem('userEmail');
   const navigate = useNavigate();
+  console.log(userEmail)
 
   const submitHandler = async (e) => {
     e.preventDefault();
     try {
+      setLoading(true);
       const response = await axios.post(
         process.env.REACT_APP_SIGNUP_CEASER_CYPHER,
-        { username: username, key }
+        { id: parseInt(userId), key }
       );
       console.log("Cypher: ", response);
-      if (response.status === 200) {
+      
+      const confirmUser = await axios.post("https://jmwefvfgih.execute-api.us-east-1.amazonaws.com/DalVacation/auth/confirmUser", {
+        username: userEmail
+      })
+      
+      console.log("Confirm User: ", confirmUser);
+      setLoading(false);
+      if(confirmUser.data.statusCode === 200) {
         navigate("/login");
       }
-
-      const confirmUser = await axios.post('https://m21jpbf7qb.execute-api.us-east-1.amazonaws.com/test/confirm-user', {
-        username: username
-      })
-
-        console.log("Confirm User: ", confirmUser);
     } catch (err) {
       console.log(err);
     }
   };
 
   return (
-    <Container maxWidth="sm">
+    <>
+    {loading ? (<LoaderComponent/>) : (<Container maxWidth="sm">
       <Box
         display="flex"
         alignItems="center"
@@ -70,7 +77,8 @@ const CeaserCipher = () => {
           </form>
         </Paper>
       </Box>
-    </Container>
+    </Container>)}
+    </>
   );
 };
 
