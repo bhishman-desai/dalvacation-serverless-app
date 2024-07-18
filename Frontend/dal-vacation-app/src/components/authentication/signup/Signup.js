@@ -12,28 +12,24 @@ import {
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import LoaderComponent from "../../utils/loader";
 
 function Signup() {
   const [username, setUsername] = useState("");
-  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("User");
   const [usernameError, setUsernameError] = useState("");
-  const [nameError, setNameError] = useState("");
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [signupError, setSignupError] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     let valid = true;
 
-    if (!name) {
-      setNameError("Name cannot be empty.");
-      valid = false;
-    }
     if (!username) {
       setUsernameError("Username cannot be empty.");
       valid = false;
@@ -50,26 +46,21 @@ function Signup() {
     if (!valid) return;
 
     try {
+      setLoading(true);
       const response = await axios.post(
         process.env.REACT_APP_SIGNUP_URL,
-        { username, name, email, password, role }
+        { username, email, password, role }
       );
+      setLoading(false);
       console.log("Signup Response", response);
       if (response.data.statusCode === 200) {
-        localStorage.setItem("username", username);
-        localStorage.setItem("loggedIn", true);
+        localStorage.setItem("userEmail", email);
+        localStorage.setItem("userId", response.data.userId);
         navigate("/confirm/signup");
       }
     } catch (error) {
       console.log("Error", error);
       setSignupError("Signup failed. Please check your details and try again.");
-    }
-  };
-
-  const handleNameChange = (e) => {
-    setName(e.target.value);
-    if (e.target.value) {
-      setNameError("");
     }
   };
 
@@ -95,7 +86,8 @@ function Signup() {
   };
 
   return (
-    <Container maxWidth="sm">
+    <>
+    {loading ? (<LoaderComponent/>) : (<Container maxWidth="sm">
       <Box
         sx={{
           marginTop: 4,
@@ -123,30 +115,11 @@ function Signup() {
         )}
         <form onSubmit={handleSubmit}>
           <TextField
-            label="Name"
-            variant="outlined"
-            fullWidth
-            margin="dense"
-            value={name}
-            onChange={handleNameChange}
-            error={Boolean(nameError)}
-            helperText={nameError}
-            sx={{
-              marginBottom: 1,
-              "& .MuiInputLabel-root": {
-                fontSize: 14,
-              },
-              "& .MuiInputBase-root": {
-                fontSize: 14, 
-              },
-            }}
-          />
-          <TextField
             label="Username"
             variant="outlined"
             fullWidth
             margin="dense"
-            placeholder="Enter your email address as username"
+            placeholder="Enter your username"
             value={username}
             onChange={handleUsernameChange}
             error={Boolean(usernameError)}
@@ -243,7 +216,8 @@ function Signup() {
           </Button>
         </form>
       </Box>
-    </Container>
+    </Container>)}
+    </>
   );
 }
 

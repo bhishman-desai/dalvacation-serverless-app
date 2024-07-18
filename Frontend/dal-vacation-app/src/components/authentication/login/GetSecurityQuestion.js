@@ -9,6 +9,8 @@ import {
   Paper,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import { useUserStore } from "../../../store";
+
 
 function GetSecurityQuestion() {
   const [securityQuestion, setSecurityQuestion] = useState("");
@@ -17,20 +19,25 @@ function GetSecurityQuestion() {
   const [correctAnswer, setCorrectAnswer] = useState("");
   const username = localStorage.getItem("username");
   const navigate = useNavigate();
+  const { user } = useUserStore();
+  console.log(user)
 
   useEffect(() => {
+    if(!user){
+      navigate('/login')
+    }
     const retrieveQuestion = async () => {
       try {
         const response = await axios.post(
           process.env.REACT_APP_GET_SECURITY_QUESTION,
           {
-            username: username,
+            id: parseInt(user.id),
           }
         );
         console.log("username" + username, response);
-        const { question, answers } = response.data.body;
+        const { question, answer } = response.data.body;
         setSecurityQuestion(question);
-        setCorrectAnswer(answers);
+        setCorrectAnswer(answer);
       } catch (error) {
         setError("Error retrieving security question");
         console.error(error);

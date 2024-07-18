@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Container, Typography, Select, TextField, Button, MenuItem, FormControl, InputLabel, Box } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import LoaderComponent from '../../utils/loader';
 
 function SecurityQuestions() {
     const questions = [
@@ -13,8 +14,9 @@ function SecurityQuestions() {
       ];
   const [selectedQuestion, setSelectedQuestion] = useState(questions[0]);
   const [answer, setAnswer] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate()
-  const username = localStorage.getItem('username');
+  const userId = localStorage.getItem('userId');
 
   const handleQuestionChange = (event) => {
     setSelectedQuestion(event.target.value);
@@ -26,16 +28,18 @@ function SecurityQuestions() {
 
   const handleNext = async (event) => {
     try {
+      setLoading(true);
       const response = await axios.post(
         process.env.REACT_APP_SIGNUP_SECURITY_QUESTION,
         {
-          username: username,
+          id: parseInt(userId),
           answers: answer,
           question: selectedQuestion
         }
       );
+      setLoading(false);
       console.log("Security Response", response);
-      if (response.status === 200) {
+      if (response.data.statusCode === 200) {
         navigate("/signup/ceaser-cypher");
       }
     } catch (error) {
@@ -44,7 +48,8 @@ function SecurityQuestions() {
   }
 
   return (
-    <Container maxWidth="sm" sx={{ py: 4, textAlign: 'center' }}>
+    <>
+    {loading ? (<LoaderComponent/>) : (<Container maxWidth="sm" sx={{ py: 4, textAlign: 'center' }}>
       <Typography variant="h4" sx={{my: 5}} component="h1" gutterBottom>
         Security Questions
       </Typography>
@@ -79,7 +84,8 @@ function SecurityQuestions() {
           </Button>
         </Box>
       </form>
-    </Container>
+    </Container>)}
+    </>
   );
 }
 

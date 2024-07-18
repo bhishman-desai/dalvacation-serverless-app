@@ -12,6 +12,9 @@ import Footer from './components/footer/Footer';
 import Home from './components/homePage/Home';
 import ExploreRooms from "./components/ExploreRooms";
 import Dashboard from './components/admin/Dashboard';
+import KommunicateChat from "./components/ChatBot/Chabot";
+
+
 function App() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
@@ -31,6 +34,7 @@ function App() {
       </Routes>
       <Footer/>
     </Router>
+      <KommunicateChat/>
     </div>
   );
 }

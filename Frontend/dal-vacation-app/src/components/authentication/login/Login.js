@@ -2,6 +2,15 @@ import React, { useState } from "react";
 import { Container, TextField, Button, Typography, Box } from "@mui/material";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import {
+  CognitoUser,
+  AuthenticationDetails,
+  CognitoUserPool,
+} from "amazon-cognito-identity-js";
+import AWS from "aws-sdk";
+import { useUserStore } from "../../../store";
+import { session } from "../helper";
+import LoaderComponent from "../../utils/loader";
 
 function Login() {
   const [username, setUsername] = useState("");
@@ -9,41 +18,66 @@ function Login() {
   const [usernameError, setUsernameError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [loginError, setLoginError] = useState("");
+  const [loading, setLoading] = useState();
   const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
+  const { user, setUser } = useUserStore();
+
+  const handleSubmit = (e) => {
     e.preventDefault();
     let valid = true;
-
+    
     if (!username) {
       setUsernameError("Username cannot be empty.");
       valid = false;
     }
-
+    
     if (!password) {
       setPasswordError("Password cannot be empty.");
       valid = false;
     }
-
+    
     if (!valid) return;
-
+    
+    setLoading(true);
+    console.log(true);
     try {
-      const response = await axios.post(
-        process.env.REACT_APP_LOGIN_URL,
-        {
-          username,
-          password
-        }
-      );
-      console.log("Login Response", response);
-      if (response.data.statusCode === 200) {
-        navigate("/login/security-question");
-        localStorage.setItem("loggedIn", true);
-      }
+      const poolData = {
+        UserPoolId: process.env.REACT_APP_COGNITO_USERPOOL_ID,
+        ClientId: process.env.REACT_APP_COGNITO_CLIENT_ID,
+      };
+  
+      const userPool = new CognitoUserPool(poolData);
+  
+      const authenticationDetails = new AuthenticationDetails({
+        Username: username,
+        Password: password,
+      });
+  
+      const userData = {
+        Username: username,
+        Pool: userPool,
+      };
+  
+      const cognitoUser = new CognitoUser(userData);
+
+  
+      cognitoUser.authenticateUser(authenticationDetails, {
+        onSuccess: async (result) => {
+          localStorage.setItem("accessToken", result.getAccessToken().getJwtToken());
+          const user = await session();
+          setUser(user);
+          navigate("/login/security-question");
+        },
+        onFailure: (err) => {
+          alert("Incorrect Username")
+        },
+      });
+
     } catch (error) {
-      console.log("Error", error);
       setLoginError("Login failed. Please check your username and password.");
     }
+    setLoading(false);
   };
 
   const handleUsernameChange = (e) => {
@@ -60,8 +94,8 @@ function Login() {
     }
   };
 
-  return (
-    <Container maxWidth="sm">
+  return (<>
+    {loading ? (<LoaderComponent/>) : (<Container maxWidth="sm">
       <Box
         sx={{
           marginTop: 4,
@@ -84,7 +118,7 @@ function Login() {
         )}
         <form onSubmit={handleSubmit}>
           <TextField
-            label="Username"
+            label="Email"
             type="text"
             variant="outlined"
             fullWidth
@@ -117,7 +151,8 @@ function Login() {
           </Button>
         </form>
       </Box>
-    </Container>
+    </Container>)}
+    </>
   );
 }
 
