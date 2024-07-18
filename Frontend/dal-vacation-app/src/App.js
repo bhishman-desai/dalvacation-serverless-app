@@ -13,6 +13,7 @@ import Home from './components/homePage/Home';
 import ExploreRooms from "./components/ExploreRooms";
 import Reviews from './components/reviews/Reviews';
 import Dashboard from './components/admin/Dashboard';
+
 function App() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>

@@ -8,6 +8,8 @@ import {
   CognitoUserPool,
 } from "amazon-cognito-identity-js";
 import AWS from "aws-sdk";
+import { useUserStore } from "../../../store";
+import { session } from "../helper";
 
 function Login() {
   const [username, setUsername] = useState("");
@@ -16,6 +18,8 @@ function Login() {
   const [passwordError, setPasswordError] = useState("");
   const [loginError, setLoginError] = useState("");
   const navigate = useNavigate();
+
+  const { user, setUser } = useUserStore();
 
   const auth = () => {
     const poolData = {
@@ -39,7 +43,7 @@ function Login() {
 
     cognitoUser.authenticateUser(authenticationDetails, {
       onSuccess: (result) => {
-        console.log("Access token: " + result.getAccessToken().getJwtToken());
+        // console.log("Access token: " + result.getAccessToken().getJwtToken());
         localStorage.setItem("accessToken", result.getAccessToken().getJwtToken());
       },
       onFailure: (err) => {
@@ -49,27 +53,6 @@ function Login() {
     });
   };
 
-  const session = () => {
-    AWS.config.update({
-      region: "us-east-1", // Your AWS region here
-    });
-    const cognitoISP = new AWS.CognitoIdentityServiceProvider();
-
-    // Get user session details
-    cognitoISP.getUser(
-      {
-        AccessToken:
-          localStorage.getItem("accessToken")
-      },
-      (err, data) => {
-        if (err) {
-          console.error("Error getting user details:", err);
-        } else {
-          console.log("User session details:", data);
-        }
-      }
-    );
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -88,19 +71,41 @@ function Login() {
     if (!valid) return;
 
     try {
-      auth();
-      // const response = await axios.post(
-      //   process.env.REACT_APP_LOGIN_URL,
-      //   {
-      //     username,
-      //     password
-      //   }
-      // );
-      // console.log("Login Response", response);
-      // if (response.data.statusCode === 200) {
-      //   navigate("/login/security-question");
-      //   localStorage.setItem("loggedIn", true);
-      // }
+      // const v = await session()
+      // console.log(v)
+      const poolData = {
+        UserPoolId: "us-east-1_x1sxS2NLA",
+        ClientId: "3asm0dioqbmn32lh0vie0lcecb",
+      };
+  
+      const userPool = new CognitoUserPool(poolData);
+  
+      const authenticationDetails = new AuthenticationDetails({
+        Username: username,
+        Password: password,
+      });
+  
+      const userData = {
+        Username: username,
+        Pool: userPool,
+      };
+  
+      const cognitoUser = new CognitoUser(userData);
+  
+      cognitoUser.authenticateUser(authenticationDetails, {
+        onSuccess: async (result) => {
+          // console.log("Access token: " + result.getAccessToken().getJwtToken());
+          localStorage.setItem("accessToken", result.getAccessToken().getJwtToken());
+          const user = await session();
+          // console.log(user);
+          setUser(user);
+          navigate("/login/security-question");
+        },
+        onFailure: (err) => {
+          console.log(err);
+          alert("Incorrect Username")
+        },
+      });
     } catch (error) {
       console.log("Error", error);
       setLoginError("Login failed. Please check your username and password.");

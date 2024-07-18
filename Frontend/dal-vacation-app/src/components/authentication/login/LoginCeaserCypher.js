@@ -9,6 +9,8 @@ import {
   Box,
   Paper,
 } from "@mui/material";
+import { useUserStore } from "../../../store";
+
 
 const generateRandomString = (length) => {
   const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -30,19 +32,24 @@ function LoginCeaserCypher() {
   const [string, setString] = useState(generateRandomString(5));
   const username = localStorage.getItem("username");
   const navigate = useNavigate();
+  const { user } = useUserStore();
+  // console.log(user.id)
 
   useEffect(() => {
+    if(!user){
+      navigate('/login')
+    }
     const retrieveQuestion = async () => {
       try {
         const response = await axios.post(
           process.env.REACT_APP_LOGIN_CEASER_CYPHER,
           {
-            username: username,
+            id: parseInt(user.id),
           }
         );
         console.log("Login cypher response", response);
         const { body } = response.data;
-        setCypherKey(body);
+        setCypherKey(parseInt(body));
         setCorrectAnswer(body);
       } catch (error) {
         setError("Error retrieving cypher key");
@@ -80,7 +87,10 @@ function LoginCeaserCypher() {
     console.log(caesarCipher(string, cypherKey));
     if (answer === caesarCipher(string, cypherKey)) {
       navigate("/login/explore-rooms");
-      console.log("Answer is correct. Moving to the next step.");
+      localStorage.setItem("userId", user.id);
+      localStorage.setItem("userEmail", user.email);
+      localStorage.setItem("Role", user.role);
+      localStorage.setItem("userName", user.username);
     } else {
       setError("Incorrect answer. Please try again.");
     }
@@ -88,6 +98,7 @@ function LoginCeaserCypher() {
 
   return (
     <Container maxWidth="lg">
+      <h2>{cypherKey}</h2>
       <Box display="flex" alignItems="center" minHeight="60vh">
         <Paper elevation={3} sx={{ p: 4, width: "100%" }}>
           <Typography variant="h4" component="h1" gutterBottom align="center">

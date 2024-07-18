@@ -25,15 +25,19 @@ const CeaserCipher = () => {
         { id: parseInt(userId), key }
       );
       console.log("Cypher: ", response);
-      // if (response.status === 200) {
-      //   navigate("/login");
-      // }
+      if (response.status === 200) {
+        navigate("/login");
+      }
 
-      const confirmUser = await axios.post("https://zrgk02vc95.execute-api.us-east-1.amazonaws.com/DalVacation/auth/confirmUser", {
+      const confirmUser = await axios.post("https://jmwefvfgih.execute-api.us-east-1.amazonaws.com/DalVacation/auth/confirmUser", {
         username: userEmail
       })
 
-        console.log("Confirm User: ", confirmUser);
+      if(confirmUser.data.statusCode === 200) {
+        navigate("/login");
+      }
+
+      console.log("Confirm User: ", confirmUser);
     } catch (err) {
       console.log(err);
     }
