@@ -13,6 +13,8 @@ import Home from './components/homePage/Home';
 import ExploreRooms from "./components/ExploreRooms";
 import Reviews from './components/reviews/Reviews';
 import Dashboard from './components/admin/Dashboard';
+import KommunicateChat from "./components/ChatBot/Chabot";
+
 
 function App() {
   return (
@@ -34,6 +36,7 @@ function App() {
       <Reviews/>
       <Footer/>
     </Router>
+      <KommunicateChat/>
     </div>
   );
 }

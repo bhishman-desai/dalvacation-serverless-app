@@ -4,9 +4,6 @@
 /node_modules
 /.pnp
 .pnp.js
-/MessagePassing/cloud_function/node_modules
-/MessagePassing/cloud_function/serverless-426417-cf96236756bb.json
-/MessagePassing/lambda/serverless-426417-cf96236756bb.json
 
 # testing
 /coverage
