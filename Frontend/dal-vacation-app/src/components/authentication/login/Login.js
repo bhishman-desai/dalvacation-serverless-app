@@ -40,12 +40,12 @@ function Login() {
     if (!valid) return;
     
     setLoading(true);
-    console.log(true);
     try {
       const poolData = {
         UserPoolId: process.env.REACT_APP_COGNITO_USERPOOL_ID,
         ClientId: process.env.REACT_APP_COGNITO_CLIENT_ID,
       };
+
   
       const userPool = new CognitoUserPool(poolData);
   
@@ -71,6 +71,7 @@ function Login() {
         },
         onFailure: (err) => {
           alert("Incorrect Username")
+          // throw new Error(err.message);
         },
       });
 

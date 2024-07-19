@@ -47,16 +47,21 @@ function Signup() {
 
     try {
       setLoading(true);
-      const response = await axios.post(
+      const responseSignup = await axios.post(
         process.env.REACT_APP_SIGNUP_URL,
         { username, email, password, role }
       );
+      console.log(responseSignup.data);
+      const response = await axios.post('https://jmwefvfgih.execute-api.us-east-1.amazonaws.com/DalVacation/auth/storeDetails', { username, email, role });
+      console.log(response.data);
       setLoading(false);
-      console.log("Signup Response", response);
+      // console.log("Signup Response", response);
       if (response.data.statusCode === 200) {
         localStorage.setItem("userEmail", email);
         localStorage.setItem("userId", response.data.userId);
         navigate("/confirm/signup");
+      }else{
+        throw new Error(response.data.message);
       }
     } catch (error) {
       console.log("Error", error);

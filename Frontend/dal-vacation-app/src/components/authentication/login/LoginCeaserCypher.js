@@ -81,6 +81,11 @@ function LoginCeaserCypher() {
   const submitHandler = async (e) => {
     e.preventDefault();
     if (answer === caesarCipher(string, cypherKey)) {
+      const sendEmail = await axios.post("https://jmwefvfgih.execute-api.us-east-1.amazonaws.com/DalVacation/sendEmail", {
+        email: user.email,
+        body:"Logged In"
+      })
+      console.log(sendEmail);
       navigate("/login/explore-rooms");
       localStorage.setItem("userId", user.id);
       localStorage.setItem("userEmail", user.email);
