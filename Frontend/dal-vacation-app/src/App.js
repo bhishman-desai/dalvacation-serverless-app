@@ -13,6 +13,7 @@ import Home from './components/homePage/Home';
 import ExploreRooms from "./components/ExploreRooms";
 import Dashboard from './components/admin/Dashboard';
 import KommunicateChat from "./components/ChatBot/Chabot";
+import AddRoom from './components/room/AddRoom';
 
 
 function App() {
@@ -29,8 +30,9 @@ function App() {
         <Route path='/signup/ceaser-cypher' element={<CeaserCipher/>} />
         <Route path='/login/security-question' element={<GetSecurityQuestion/>} />
         <Route path='/login/ceaser-cypher' element={<LoginCeaserCypher/>} />
-        <Route path='/login/explore-rooms' element={<ExploreRooms/>}/>
+        <Route path='/explore-rooms' element={<ExploreRooms/>}/>
         <Route path='/admin/dashboard' element={<Dashboard/>} />
+        <Route path='/add-room' element={<AddRoom/>} />
       </Routes>
       <Footer/>
     </Router>

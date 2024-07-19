@@ -81,7 +81,7 @@ function LoginCeaserCypher() {
   const submitHandler = async (e) => {
     e.preventDefault();
     if (answer === caesarCipher(string, cypherKey)) {
-      navigate("/login/explore-rooms");
+      navigate("/explore-rooms");
       localStorage.setItem("userId", user.id);
       localStorage.setItem("userEmail", user.email);
       localStorage.setItem("Role", user.role);

@@ -8,23 +8,20 @@ import {
 } from "@mui/material";
 
 function Navbar() {
-  const token = localStorage.getItem("token");
-  const isLoggedIn = localStorage.getItem("loggedIn");
+  const token = localStorage.getItem("accessToken");
+  const role = localStorage.getItem("Role")
   const navigate = useNavigate();
 
   let authentication = [
     {
-      name: isLoggedIn ? "Logout" : "Login",
+      name: token ? "Logout" : "Login",
     }
   ];
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
+    localStorage.removeItem("accessToken");
     localStorage.removeItem("email");
-    if(isLoggedIn) {
-      localStorage.removeItem("loggedIn");
-      localStorage.removeItem("username");
-    }
+    localStorage.removeItem("Role");
     navigate("/");
   };
 
@@ -35,7 +32,8 @@ function Navbar() {
           DalVacationHome
         </Typography>
 
-        {!token && (
+        { role === "PropertyAgent" ? 
+        (
           <Box sx={{ display: 'flex', gap: 2 }}>
             <Button
               color="inherit"
@@ -45,8 +43,25 @@ function Navbar() {
             >
               Home
             </Button>
+            <Button
+            color="inherit"
+            component={Link}
+            to="/admin/dashboard"
+            sx={{ ml: 2 }}
+            >
+              Dashboard
+            </Button>
+
+            <Button
+            color="inherit"
+            component={Link}
+            to="/admin/dashboard"
+            sx={{ ml: 2 }}
+            >
+              Add Room
+            </Button>
             {
-              isLoggedIn ? ("") : (<Button
+              token ? ("") : (<Button
                 color="inherit"
                 component={Link}
                 to="/signup"
@@ -69,34 +84,74 @@ function Navbar() {
               ))
             }
           </Box>
-        )}
-
-        {token && (
-          <>
+        ) : role === 'User' ? (
+          <Box sx={{ display: 'flex', gap: 2 }}>
             <Button
               color="inherit"
               component={Link}
-              to="/dashboard"
+              to="/"
               sx={{ ml: 2 }}
             >
-              Dashboard
+              Home
             </Button>
+            {
+              token ? ("") : (<Button
+                color="inherit"
+                component={Link}
+                to="/signup"
+                sx={{ ml: 2 }}
+              >
+                Signup
+              </Button>)
+            }
+            {
+              authentication.map((item) => (
+                <Button
+                  color="inherit"
+                  component={Link}
+                  onClick={handleLogout}
+                  to={item.name === "Login" ? "/login" : "/"}
+                  sx={{ ml: 2 }}
+                >
+                  {item.name}
+                </Button>
+              ))
+            }
+          </Box>
+        ) : (
+          <Box sx={{ display: 'flex', gap: 2 }}>
             <Button
               color="inherit"
               component={Link}
-              to="/add-blog"
+              to="/"
               sx={{ ml: 2 }}
             >
-              Add Blog
+              Home
             </Button>
-            <Button
-              color="inherit"
-              onClick={handleLogout}
-              sx={{ ml: 2 }}
-            >
-              Logout
-            </Button>
-          </>
+            {
+              token ? ("") : (<Button
+                color="inherit"
+                component={Link}
+                to="/signup"
+                sx={{ ml: 2 }}
+              >
+                Signup
+              </Button>)
+            }
+            {
+              authentication.map((item) => (
+                <Button
+                  color="inherit"
+                  component={Link}
+                  onClick={handleLogout}
+                  to={item.name === "Login" ? "/login" : "/"}
+                  sx={{ ml: 2 }}
+                >
+                  {item.name}
+                </Button>
+              ))
+            }
+          </Box>
         )}
       </Toolbar>
     </AppBar>
