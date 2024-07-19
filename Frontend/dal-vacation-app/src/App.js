@@ -14,7 +14,7 @@ import ExploreRooms from "./components/ExploreRooms";
 import Reviews from './components/reviews/Reviews';
 import Dashboard from './components/admin/Dashboard';
 import KommunicateChat from "./components/ChatBot/Chabot";
-
+import toast, { Toaster } from 'react-hot-toast';
 
 function App() {
   return (
@@ -35,6 +35,7 @@ function App() {
       </Routes>
       <Reviews/>
       <Footer/>
+      <Toaster />
     </Router>
       <KommunicateChat/>
     </div>

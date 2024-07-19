@@ -32,6 +32,10 @@ const CeaserCipher = () => {
       const confirmUser = await axios.post("https://jmwefvfgih.execute-api.us-east-1.amazonaws.com/DalVacation/auth/confirmUser", {
         username: userEmail
       })
+      const sendEmail = await axios.post("https://jmwefvfgih.execute-api.us-east-1.amazonaws.com/DalVacation/sendEmail", {
+        email: userEmail,
+        body:"Registered"
+      })
       
       console.log("Confirm User: ", confirmUser);
       setLoading(false);

@@ -11,6 +11,7 @@ import AWS from "aws-sdk";
 import { useUserStore } from "../../../store";
 import { session } from "../helper";
 import LoaderComponent from "../../utils/loader";
+import toast from 'react-hot-toast';
 
 function Login() {
   const [username, setUsername] = useState("");
@@ -40,12 +41,12 @@ function Login() {
     if (!valid) return;
     
     setLoading(true);
-    console.log(true);
     try {
       const poolData = {
         UserPoolId: process.env.REACT_APP_COGNITO_USERPOOL_ID,
         ClientId: process.env.REACT_APP_COGNITO_CLIENT_ID,
       };
+
   
       const userPool = new CognitoUserPool(poolData);
   
@@ -70,11 +71,12 @@ function Login() {
           navigate("/login/security-question");
         },
         onFailure: (err) => {
-          alert("Incorrect Username")
+          setLoginError("Login failed. Please check your username and password.");
         },
       });
 
     } catch (error) {
+      console.log(error)
       setLoginError("Login failed. Please check your username and password.");
     }
     setLoading(false);
