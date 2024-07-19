@@ -11,6 +11,7 @@ import AWS from "aws-sdk";
 import { useUserStore } from "../../../store";
 import { session } from "../helper";
 import LoaderComponent from "../../utils/loader";
+import toast from 'react-hot-toast';
 
 function Login() {
   const [username, setUsername] = useState("");
@@ -70,12 +71,12 @@ function Login() {
           navigate("/login/security-question");
         },
         onFailure: (err) => {
-          alert("Incorrect Username")
-          // throw new Error(err.message);
+          setLoginError("Login failed. Please check your username and password.");
         },
       });
 
     } catch (error) {
+      console.log(error)
       setLoginError("Login failed. Please check your username and password.");
     }
     setLoading(false);
