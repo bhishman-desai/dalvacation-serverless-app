@@ -36,7 +36,7 @@ resource "google_cloudfunctions2_function" "complaint_function" {
     max_instance_request_concurrency = 80
     available_cpu = "4"
     environment_variables = {
-      PROPERTY_AGENTS = "bpdatal5@gmail.com, bhishman@dal.ca"
+      PROPERTY_AGENTS = "bpdatal5@gmail.com, bhishman@dal.ca, shivang2727@gmail.com, Abhishekrocks922@gmail.com, testmaillab2023@gmail.com"
     }
     ingress_settings = "ALLOW_INTERNAL_ONLY"
     all_traffic_on_latest_revision = true

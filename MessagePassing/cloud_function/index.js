@@ -1,5 +1,6 @@
 /* CONSUMER */
 const functions = require('@google-cloud/functions-framework');
+const axios = require('axios');
 
 /* Initialize Firestore client */
 const admin = require('firebase-admin');
@@ -17,7 +18,18 @@ functions.cloudEvent('forwardComplaint', async (cloudEvent) => {
     /* Forward to a random property agent */
     const propertyAgents = process.env.PROPERTY_AGENTS.split(',');
     const chosenAgent = propertyAgents[Math.floor(Math.random() * propertyAgents.length)];
-    /* TODO: Add logic of sending a mail to the chosenAgent with parsedMessage.clientId and parsedMessage.complaint */
+
+    /* Logic of sending an email to the chosenAgent with parsedMessage.clientId and parsedMessage.complaint */
+    try {
+        /* Send an email using an external API */
+        const sendEmail = await axios.post("https://jmwefvfgih.execute-api.us-east-1.amazonaws.com/DalVacation/sendEmail", {
+            email: chosenAgent,
+            body: `Client ID: ${parsedMessage.clientId}\nComplaint: ${parsedMessage.complaint}`
+        });
+        console.log('Email sent successfully:', sendEmail.data);
+    } catch (error) {
+        console.error('Error sending email:', error);
+    }
 
     /* Add a log entry to Firestore */
     try {
