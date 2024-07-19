@@ -94,6 +94,14 @@ function Navbar() {
             >
               Home
             </Button>
+            <Button
+              color="inherit"
+              component={Link}
+              to="/explore-rooms"
+              sx={{ ml: 2 }}
+            >
+              Listings
+            </Button>
             {
               token ? ("") : (<Button
                 color="inherit"

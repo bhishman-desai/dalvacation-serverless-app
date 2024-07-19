@@ -1,5 +1,5 @@
 import axios from "axios";
-import React, { useEffect, useId, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Button,
@@ -22,6 +22,8 @@ const roomTypes = [
   { value: "queen", label: "Queen" },
   { value: "king", label: "King" },
   { value: "suite", label: "Suite" },
+  { value: "studio", label: "Studio" },
+  { value: "penthouse", label: "Penthouse" },
 ];
 
 const featureOptions = [
@@ -38,13 +40,12 @@ function AddRoom() {
   const [features, setFeatures] = useState([]);
   const [roomNumber, setRoomNumber] = useState("");
   const navigate = useNavigate();
-  const id = useId();
+  const role = localStorage.getItem("Role");
   const [formData, setFormData] = useState({
-    // roomid: id,
     type: "",
     price: "",
     features: [],
-    room_no: ""
+    room_no: "",
   });
 
   useEffect(() => {
@@ -53,7 +54,7 @@ function AddRoom() {
       type: roomType,
       price: price,
       features: features.map((feature) => feature.value),
-      room_no: roomNumber
+      room_no: roomNumber,
     }));
   }, [roomType, price, features, roomNumber]);
 
@@ -96,79 +97,85 @@ function AddRoom() {
   };
 
   return (
-    <Container maxWidth="sm">
-      <Paper elevation={3} sx={{ p: 4, mt: 4 }}>
-        <Typography variant="h4" component="h1" gutterBottom>
-          Add Room
-        </Typography>
-        <form onSubmit={handleSubmit}>
-          <FormControl fullWidth margin="normal" sx={{ mb: 2 }}>
-            <InputLabel id="room-type-label">Room Type</InputLabel>
-            <MUISelect
-              labelId="room-type-label"
-              value={roomType}
-              onChange={(e) => setRoomType(e.target.value)}
-              label="Room Type"
-            >
-              {roomTypes.map((type) => (
-                <MenuItem key={type.value} value={type.value}>
-                  {type.label}
-                </MenuItem>
-              ))}
-            </MUISelect>
-          </FormControl>
-          <TextField
-            fullWidth
-            margin="normal"
-            label="Price"
-            type="number"
-            value={price}
-            onChange={(e) => setPrice(e.target.value)}
-            sx={{ mb: 2 }}
-          />
-          <TextField
-            fullWidth
-            margin="normal"
-            label="Room Number"
-            type="number"
-            value={roomNumber}
-            onChange={(e) => setRoomNumber(e.target.value)}
-            sx={{ mb: 2 }}
-          />
-          <Box mt={2}>
-            <InputLabel>Features</InputLabel>
-            <Select
-              isMulti
-              options={featureOptions}
-              value={features}
-              onChange={setFeatures}
-              components={{
-                MultiValue: ({ children, ...props }) => (
-                  <Chip
-                    {...props.innerProps}
-                    label={children}
-                    {...props.data}
-                    onDelete={props.removeProps.onClick}
-                    deleteIcon={null}
-                    variant="outlined"
-                    sx={{ margin: 0.5 }}
-                  />
-                ),
-              }}
-              sx={{ mt: 1 }}
-            />
-          </Box>
-          <Button
-            type="submit"
-            variant="contained"
-            color="primary"
-            sx={{ mt: 2 }}
-          >
-            Add Room
-          </Button>
-        </form>
-      </Paper>
-    </Container>
+    <>
+      {role === "PropertyAgent" ? (
+        <Container maxWidth="sm">
+          <Paper elevation={3} sx={{ p: 4, mt: 4 }}>
+            <Typography variant="h4" component="h1" gutterBottom>
+              Add Room
+            </Typography>
+            <form onSubmit={handleSubmit}>
+              <FormControl fullWidth margin="normal" sx={{ mb: 2 }}>
+                <InputLabel id="room-type-label">Room Type</InputLabel>
+                <MUISelect
+                  labelId="room-type-label"
+                  value={roomType}
+                  onChange={(e) => setRoomType(e.target.value)}
+                  label="Room Type"
+                >
+                  {roomTypes.map((type) => (
+                    <MenuItem key={type.value} value={type.value}>
+                      {type.label}
+                    </MenuItem>
+                  ))}
+                </MUISelect>
+              </FormControl>
+              <TextField
+                fullWidth
+                margin="normal"
+                label="Price"
+                type="number"
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
+                sx={{ mb: 2 }}
+              />
+              <TextField
+                fullWidth
+                margin="normal"
+                label="Room Number"
+                type="number"
+                value={roomNumber}
+                onChange={(e) => setRoomNumber(e.target.value)}
+                sx={{ mb: 2 }}
+              />
+              <Box mt={2}>
+                <InputLabel>Features</InputLabel>
+                <Select
+                  isMulti
+                  options={featureOptions}
+                  value={features}
+                  onChange={setFeatures}
+                  components={{
+                    MultiValue: ({ children, ...props }) => (
+                      <Chip
+                        {...props.innerProps}
+                        label={children}
+                        {...props.data}
+                        onDelete={props.removeProps.onClick}
+                        deleteIcon={null}
+                        variant="outlined"
+                        sx={{ margin: 0.5 }}
+                      />
+                    ),
+                  }}
+                  sx={{ mt: 1 }}
+                />
+              </Box>
+              <Button
+                type="submit"
+                variant="contained"
+                color="primary"
+                sx={{ mt: 2 }}
+              >
+                Add Room
+              </Button>
+            </form>
+          </Paper>
+        </Container>
+      ) : (
+        <div>Access Denied</div>
+      )}
+    </>
   );
 }
 

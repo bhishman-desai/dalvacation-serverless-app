@@ -33,6 +33,7 @@ function LoginCeaserCypher() {
   const username = localStorage.getItem("username");
   const navigate = useNavigate();
   const { user } = useUserStore();
+  // const role = localStorage.getItem("Role");
 
   useEffect(() => {
     if(!user){
@@ -81,11 +82,20 @@ function LoginCeaserCypher() {
   const submitHandler = async (e) => {
     e.preventDefault();
     if (answer === caesarCipher(string, cypherKey)) {
-      navigate("/explore-rooms");
+      const sendEmail = await axios.post("https://jmwefvfgih.execute-api.us-east-1.amazonaws.com/DalVacation/sendEmail", {
+        email: user.email,
+        body:"Logged In"
+      })
+      console.log(sendEmail);
       localStorage.setItem("userId", user.id);
       localStorage.setItem("userEmail", user.email);
       localStorage.setItem("Role", user.role);
       localStorage.setItem("userName", user.username);
+      if ( user.role === "PropertyAgent") {
+        navigate("/admin/dashboard");
+      } else {
+        navigate("/explore-rooms");
+      }
     } else {
       setError("Incorrect answer. Please try again.");
     }

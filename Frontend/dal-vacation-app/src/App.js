@@ -14,7 +14,7 @@ import ExploreRooms from "./components/ExploreRooms";
 import Dashboard from './components/admin/Dashboard';
 import KommunicateChat from "./components/ChatBot/Chabot";
 import AddRoom from './components/room/AddRoom';
-
+import toast, { Toaster } from 'react-hot-toast';
 
 function App() {
   return (
@@ -35,6 +35,7 @@ function App() {
         <Route path='/add-room' element={<AddRoom/>} />
       </Routes>
       <Footer/>
+      <Toaster />
     </Router>
       <KommunicateChat/>
     </div>

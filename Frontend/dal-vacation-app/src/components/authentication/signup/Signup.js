@@ -47,16 +47,31 @@ function Signup() {
 
     try {
       setLoading(true);
-      const response = await axios.post(
+      const responseSignup = await axios.post(
         process.env.REACT_APP_SIGNUP_URL,
         { username, email, password, role }
       );
-      setLoading(false);
-      console.log("Signup Response", response);
-      if (response.data.statusCode === 200) {
-        localStorage.setItem("userEmail", email);
-        localStorage.setItem("userId", response.data.userId);
-        navigate("/confirm/signup");
+      if (responseSignup.data.statusCode === 400) {
+          setSignupError("Error with username / password");
+        console.log(responseSignup.data)
+        setLoading(false);
+      } else {
+        const response = await axios.post(
+          "https://jmwefvfgih.execute-api.us-east-1.amazonaws.com/DalVacation/auth/storeDetails",
+          { username, email, role }
+        );
+        console.log(response.data);
+        setLoading(false);
+        // console.log("Signup Response", response);
+        if (response.data.statusCode === 200) {
+          localStorage.setItem("userEmail", email);
+          localStorage.setItem("userId", response.data.userId);
+          navigate("/confirm/signup");
+        } else {
+          setSignupError(
+            "Signup failed. Please check your details and try again."
+          );
+        }
       }
     } catch (error) {
       console.log("Error", error);
@@ -87,136 +102,140 @@ function Signup() {
 
   return (
     <>
-    {loading ? (<LoaderComponent/>) : (<Container maxWidth="sm">
-      <Box
-        sx={{
-          marginTop: 4,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          padding: 2,
-          boxShadow: 3,
-          borderRadius: 2,
-          backgroundColor: "background.paper",
-          maxHeight: "80vh",
-          overflow: "auto",
-          "&::-webkit-scrollbar": {
-            width: 0,
-          },
-        }}
-      >
-        <Typography variant="h5" component="h2" gutterBottom>
-          Signup
-        </Typography>
-        {signupError && (
-          <Typography color="error" gutterBottom>
-            {signupError}
-          </Typography>
-        )}
-        <form onSubmit={handleSubmit}>
-          <TextField
-            label="Username"
-            variant="outlined"
-            fullWidth
-            margin="dense"
-            placeholder="Enter your username"
-            value={username}
-            onChange={handleUsernameChange}
-            error={Boolean(usernameError)}
-            helperText={usernameError}
+      {loading ? (
+        <LoaderComponent />
+      ) : (
+        <Container maxWidth="sm">
+          <Box
             sx={{
-              marginBottom: 1,
-              "& .MuiInputLabel-root": {
-                fontSize: 14,
+              marginTop: 4,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              padding: 2,
+              boxShadow: 3,
+              borderRadius: 2,
+              backgroundColor: "background.paper",
+              maxHeight: "80vh",
+              overflow: "auto",
+              "&::-webkit-scrollbar": {
+                width: 0,
               },
-              "& .MuiInputBase-root": {
-                fontSize: 14,
-              },
-            }}
-          />
-          <TextField
-            label="Email"
-            type="email"
-            variant="outlined"
-            fullWidth
-            margin="dense"
-            value={email}
-            onChange={handleEmailChange}
-            error={Boolean(emailError)}
-            helperText={emailError}
-            sx={{
-              marginBottom: 1,
-              "& .MuiInputLabel-root": {
-                fontSize: 14,
-              },
-              "& .MuiInputBase-root": {
-                fontSize: 14,
-              },
-            }}
-          />
-          <TextField
-            label="Password"
-            type="password"
-            variant="outlined"
-            fullWidth
-            margin="dense"
-            value={password}
-            onChange={handlePasswordChange}
-            error={Boolean(passwordError)}
-            helperText={passwordError}
-            // required
-            sx={{
-              marginBottom: 1,
-              "& .MuiInputLabel-root": {
-                fontSize: 14,
-              },
-              "& .MuiInputBase-root": {
-                fontSize: 14,
-              },
-            }}
-          />
-          <FormControl variant="outlined" fullWidth margin="dense">
-            <InputLabel id="role-label">Role</InputLabel>
-            <Select
-              labelId="role-label"
-              id="role"
-              value={role}
-              onChange={(e) => setRole(e.target.value)}
-              label="Role"
-              sx={{
-                marginBottom: 1,
-                "& .MuiInputLabel-root": {
-                  fontSize: 14,
-                },
-                "& .MuiSelect-root": {
-                  fontSize: 14,
-                },
-              }}
-            >
-              <MenuItem value="User">User</MenuItem>
-              <MenuItem value="PropertyAgent">Property Agent</MenuItem>
-            </Select>
-          </FormControl>
-          <Button
-            type="submit"
-            variant="contained"
-            color="primary"
-            fullWidth
-            sx={{
-              marginTop: 1,
-              padding: 0.5,
-              backgroundColor: "primary.main",
-              "&:hover": {
-                backgroundColor: "primary.dark",
-              },
-              fontSize: 14,
             }}
           >
-            Signup
-          </Button>
-        </form>
-      </Box>
-    </Container>)}
+            <Typography variant="h5" component="h2" gutterBottom>
+              Signup
+            </Typography>
+            {signupError && (
+              <Typography color="error" gutterBottom>
+                {signupError}
+              </Typography>
+            )}
+            <form onSubmit={handleSubmit}>
+              <TextField
+                label="Username"
+                variant="outlined"
+                fullWidth
+                margin="dense"
+                placeholder="Enter your username"
+                value={username}
+                onChange={handleUsernameChange}
+                error={Boolean(usernameError)}
+                helperText={usernameError}
+                sx={{
+                  marginBottom: 1,
+                  "& .MuiInputLabel-root": {
+                    fontSize: 14,
+                  },
+                  "& .MuiInputBase-root": {
+                    fontSize: 14,
+                  },
+                }}
+              />
+              <TextField
+                label="Email"
+                type="email"
+                variant="outlined"
+                fullWidth
+                margin="dense"
+                value={email}
+                onChange={handleEmailChange}
+                error={Boolean(emailError)}
+                helperText={emailError}
+                sx={{
+                  marginBottom: 1,
+                  "& .MuiInputLabel-root": {
+                    fontSize: 14,
+                  },
+                  "& .MuiInputBase-root": {
+                    fontSize: 14,
+                  },
+                }}
+              />
+              <TextField
+                label="Password"
+                type="password"
+                variant="outlined"
+                fullWidth
+                margin="dense"
+                value={password}
+                onChange={handlePasswordChange}
+                error={Boolean(passwordError)}
+                helperText={passwordError}
+                // required
+                sx={{
+                  marginBottom: 1,
+                  "& .MuiInputLabel-root": {
+                    fontSize: 14,
+                  },
+                  "& .MuiInputBase-root": {
+                    fontSize: 14,
+                  },
+                }}
+              />
+              <FormControl variant="outlined" fullWidth margin="dense">
+                <InputLabel id="role-label">Role</InputLabel>
+                <Select
+                  labelId="role-label"
+                  id="role"
+                  value={role}
+                  onChange={(e) => setRole(e.target.value)}
+                  label="Role"
+                  sx={{
+                    marginBottom: 1,
+                    "& .MuiInputLabel-root": {
+                      fontSize: 14,
+                    },
+                    "& .MuiSelect-root": {
+                      fontSize: 14,
+                    },
+                  }}
+                >
+                  <MenuItem value="User">User</MenuItem>
+                  <MenuItem value="PropertyAgent">Property Agent</MenuItem>
+                </Select>
+              </FormControl>
+              <Button
+                type="submit"
+                variant="contained"
+                color="primary"
+                fullWidth
+                sx={{
+                  marginTop: 1,
+                  padding: 0.5,
+                  backgroundColor: "primary.main",
+                  "&:hover": {
+                    backgroundColor: "primary.dark",
+                  },
+                  fontSize: 14,
+                }}
+              >
+                Signup
+              </Button>
+            </form>
+          </Box>
+        </Container>
+      )}
     </>
   );
 }
