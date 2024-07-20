@@ -31,7 +31,6 @@ const RoomList = () => {
                     data.rooms.forEach(room => {
                         console.log("Room...", room);
                         initialBookingDetails[room.roomId] = {
-                            customerId: '',
                             startDate: '',
                             endDate: ''
                         };
@@ -74,7 +73,7 @@ const RoomList = () => {
 
     const handleBookRoom = (roomId) => {
         const details = bookingDetails[roomId] || {};
-        fetch('https://cehxquduntbclpdvcokvwneqqe0erxhf.lambda-url.us-east-1.on.aws/', {
+        fetch('https://ooe5pxjmx6ebnclk4s4y4uag5y0kdgvm.lambda-url.us-east-1.on.aws/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -82,9 +81,12 @@ const RoomList = () => {
             body: JSON.stringify({
                 ...details,
                 roomId: roomId,
+                userId: localStorage.getItem('userId'),
+                username: localStorage.getItem('userEmail')
             }),
         })
             .then(response => {
+                console.log("Response room...", response);
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
                 }

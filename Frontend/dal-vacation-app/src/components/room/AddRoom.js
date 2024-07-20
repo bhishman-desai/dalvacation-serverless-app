@@ -87,7 +87,7 @@ function AddRoom() {
           formDataToSend
         );
         console.log("Add blog response: " + response);
-        navigate("/listings");
+        navigate("/my-listings");
       } catch (error) {
         console.error("Error:", error);
       }

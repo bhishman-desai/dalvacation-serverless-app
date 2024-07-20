@@ -55,7 +55,7 @@ function Navbar() {
             <Button
             color="inherit"
             component={Link}
-            to="/admin/dashboard"
+            to="/add-room"
             sx={{ ml: 2 }}
             >
               Add Room
