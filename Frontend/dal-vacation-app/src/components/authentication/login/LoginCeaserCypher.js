@@ -33,6 +33,7 @@ function LoginCeaserCypher() {
   const username = localStorage.getItem("username");
   const navigate = useNavigate();
   const { user } = useUserStore();
+  // const role = localStorage.getItem("Role");
 
   useEffect(() => {
     if(!user){
@@ -86,11 +87,15 @@ function LoginCeaserCypher() {
         body:"Logged In"
       })
       console.log(sendEmail);
-      navigate("/login/explore-rooms");
       localStorage.setItem("userId", user.id);
       localStorage.setItem("userEmail", user.email);
       localStorage.setItem("Role", user.role);
       localStorage.setItem("userName", user.username);
+      if ( user.role === "PropertyAgent") {
+        navigate("/admin/dashboard");
+      } else {
+        navigate("/explore-rooms");
+      }
     } else {
       setError("Incorrect answer. Please try again.");
     }
