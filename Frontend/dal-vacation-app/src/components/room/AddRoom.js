@@ -55,6 +55,7 @@ function AddRoom() {
       price: price,
       features: features.map((feature) => feature.value),
       room_no: roomNumber,
+      userId: localStorage.getItem("userId"),
     }));
   }, [roomType, price, features, roomNumber]);
 
@@ -86,7 +87,7 @@ function AddRoom() {
           `https://65dmya5fhxtivlldh4zt45lpjq0awspv.lambda-url.us-east-1.on.aws/`,
           formDataToSend
         );
-        console.log("Add blog response: " + response);
+        console.log("Add room response: " + response);
         navigate("/my-listings");
       } catch (error) {
         console.error("Error:", error);

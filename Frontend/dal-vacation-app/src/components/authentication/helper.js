@@ -22,7 +22,7 @@ export const session = () => {
           reject(err);
         } else {
           console.log("User session details:", data.UserAttributes[0].Value);
-          const res = await axios.post("https://jmwefvfgih.execute-api.us-east-1.amazonaws.com/DalVacation/getProfile", { email : data.UserAttributes[0].Value })
+          const res = await axios.post("https://d5vbhid2fj.execute-api.us-east-1.amazonaws.com/dal-vacation/auth/get-user-profile", { email : data.UserAttributes[0].Value })
           console.log(res)
           const user = {
             id : res.data.body.id.N,

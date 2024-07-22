@@ -29,10 +29,10 @@ const CeaserCipher = () => {
       );
       console.log("Cypher: ", response);
       
-      const confirmUser = await axios.post("https://jmwefvfgih.execute-api.us-east-1.amazonaws.com/DalVacation/auth/confirmUser", {
+      const confirmUser = await axios.post("https://d5vbhid2fj.execute-api.us-east-1.amazonaws.com/dal-vacation/auth/confirm-user", {
         username: userEmail
       })
-      const sendEmail = await axios.post("https://jmwefvfgih.execute-api.us-east-1.amazonaws.com/DalVacation/sendEmail", {
+      const sendEmail = await axios.post("https://d5vbhid2fj.execute-api.us-east-1.amazonaws.com/dal-vacation/send-email", {
         email: userEmail,
         body:"Registered"
       })

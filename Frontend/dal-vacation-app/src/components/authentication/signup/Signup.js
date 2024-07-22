@@ -57,7 +57,7 @@ function Signup() {
         setLoading(false);
       } else {
         const response = await axios.post(
-          "https://jmwefvfgih.execute-api.us-east-1.amazonaws.com/DalVacation/auth/storeDetails",
+          "https://d5vbhid2fj.execute-api.us-east-1.amazonaws.com/dal-vacation/store-user-details",
           { username, email, role }
         );
         console.log(response.data);

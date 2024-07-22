@@ -16,6 +16,7 @@ import KommunicateChat from "./components/ChatBot/Chabot";
 import AddRoom from './components/room/AddRoom';
 import toast, { Toaster } from 'react-hot-toast';
 import RoomDetails from './components/room/RoomDetails';
+import MyListings from './components/admin/MyListings';
 
 function App() {
   return (
@@ -35,6 +36,7 @@ function App() {
         <Route path='/admin/dashboard' element={<Dashboard/>} />
         <Route path='/add-room' element={<AddRoom/>} />
         <Route path='/explore-rooms/:roomId' element={<RoomDetails/>} />
+        <Route path='/my-listings' element={<MyListings/>} />
       </Routes>
       <Footer/>
       <Toaster />

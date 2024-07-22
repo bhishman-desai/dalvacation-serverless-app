@@ -1,6 +1,5 @@
 import React from 'react';
-import {Container, Grid, Typography, Card, CardContent, CardMedia, Box, Divider, Button} from '@mui/material';
-import Reviews from '../reviews/Reviews';
+import {Container, Grid, Typography, Card, CardContent, CardMedia, Box, Divider} from '@mui/material';
 
 const dummyRooms = [
     {
@@ -188,7 +187,6 @@ const Home = () => {
                 ))}
             </Grid>
         </Container>
-        <Reviews/>
         </>
     );
 };

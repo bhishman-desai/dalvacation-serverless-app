@@ -4,7 +4,7 @@ import {
   Toolbar,
   Typography,
   Button,
-  Box, // Import Box component
+  Box,
 } from "@mui/material";
 
 function Navbar() {
@@ -135,6 +135,14 @@ function Navbar() {
               sx={{ ml: 2 }}
             >
               Home
+            </Button>
+            <Button
+              color="inherit"
+              component={Link}
+              to="/explore-rooms"
+              sx={{ ml: 2 }}
+            >
+              Listings
             </Button>
             {
               token ? ("") : (<Button

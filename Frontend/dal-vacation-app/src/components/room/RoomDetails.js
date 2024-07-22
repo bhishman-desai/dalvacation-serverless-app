@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Button,
@@ -10,6 +10,7 @@ import {
   Typography,
 } from "@mui/material";
 import { useLocation } from "react-router-dom";
+import Reviews from "../reviews/Reviews";
 
 const RoomDetails = () => {
   const location = useLocation();
@@ -18,6 +19,8 @@ const RoomDetails = () => {
     startDate: "",
     endDate: "",
   });
+  const [reviews, setReviews] = useState([]);
+  const [newReview, setNewReview] = useState("");
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
@@ -51,8 +54,39 @@ const RoomDetails = () => {
       })
       .then((data) => {
         alert("Room booked successfully!");
+        console.log("data............", data);
       })
       .catch((error) => console.error("Error booking room:", error));
+  };
+
+  const handleReviewSubmit = () => {
+    const reviewData = {
+      description: newReview,
+      roomId: room.roomId,
+      email: localStorage.getItem("userEmail"),
+    };
+
+    fetch(
+      "https://ncsf6xijm6.execute-api.us-east-1.amazonaws.com/test/looker-studio",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(reviewData),
+      }
+    )
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        setReviews((prevReviews) => [...prevReviews, data]);
+        setNewReview("");
+      })
+      .catch((error) => console.error("Error adding review:", error));
   };
 
   return (
@@ -106,8 +140,36 @@ const RoomDetails = () => {
               Book Room
             </Button>
           </Box>
+          <Box sx={{ mt: 4 }}>
+            <Box
+              component="form"
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleReviewSubmit();
+              }}
+              sx={{ mt: 2 }}
+            >
+              <TextField
+                fullWidth
+                label="Add a review"
+                value={newReview}
+                onChange={(e) => setNewReview(e.target.value)}
+                multiline
+                rows={4}
+              />
+              <Button
+                type="submit"
+                variant="contained"
+                color="primary"
+                sx={{ mt: 2 }}
+              >
+                Submit Review
+              </Button>
+            </Box>
+          </Box>
         </CardContent>
       </Card>
+      <Reviews roomId={room.roomId}/>
     </Container>
   );
 };
