@@ -9,7 +9,7 @@ function Reviews({ roomId }) {
     const fetchReviews = async () => {
       try {
         const response = await axios.post(
-          `${process.env.REACT_APP_BACKEND_URL}/reviews`,
+          `https://d5vbhid2fj.execute-api.us-east-1.amazonaws.com/dal-vacation/reviews`,
           {
             roomId: roomId,
             action: "getReviews",

@@ -23,14 +23,14 @@ const CeaserCipher = () => {
     try {
       setLoading(true);
       const response = await axios.post(
-        `${process.env.REACT_APP_BACKEND_URL}/cipher/store-cipher`,
+        `https://d5vbhid2fj.execute-api.us-east-1.amazonaws.com/dal-vacation/cipher/store-cipher`,
         { id: parseInt(userId), key }
       );
       
-      const confirmUser = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/auth/confirm-user`, {
+      const confirmUser = await axios.post(`https://d5vbhid2fj.execute-api.us-east-1.amazonaws.com/dal-vacation/auth/confirm-user`, {
         username: userEmail
       })
-      const sendEmail = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/send-email`, {
+      const sendEmail = await axios.post(`https://d5vbhid2fj.execute-api.us-east-1.amazonaws.com/dal-vacation/send-email`, {
         email: userEmail,
         body:"Registered"
       })

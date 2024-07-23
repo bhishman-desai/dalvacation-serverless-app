@@ -30,7 +30,7 @@ function SecurityQuestions() {
     try {
       setLoading(true);
       const response = await axios.post(
-        `${process.env.REACT_APP_BACKEND_URL}/security/signup-security`,
+        `https://d5vbhid2fj.execute-api.us-east-1.amazonaws.com/dal-vacation/security/signup-security`,
         {
           id: parseInt(userId),
           answers: answer,
