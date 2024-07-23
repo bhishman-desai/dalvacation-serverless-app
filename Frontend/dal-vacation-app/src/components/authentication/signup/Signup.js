@@ -53,16 +53,13 @@ function Signup() {
       );
       if (responseSignup.data.statusCode === 400) {
           setSignupError("Error with username / password");
-        console.log(responseSignup.data)
         setLoading(false);
       } else {
         const response = await axios.post(
-          "https://jmwefvfgih.execute-api.us-east-1.amazonaws.com/DalVacation/auth/storeDetails",
+          `${process.env.REACT_APP_BACKEND_URL}/store-user-details`,
           { username, email, role }
         );
-        console.log(response.data);
         setLoading(false);
-        // console.log("Signup Response", response);
         if (response.data.statusCode === 200) {
           localStorage.setItem("userEmail", email);
           localStorage.setItem("userId", response.data.userId);

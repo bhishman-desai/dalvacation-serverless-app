@@ -38,7 +38,6 @@ function SecurityQuestions() {
         }
       );
       setLoading(false);
-      console.log("Security Response", response);
       if (response.data.statusCode === 200) {
         navigate("/signup/ceaser-cypher");
       }
