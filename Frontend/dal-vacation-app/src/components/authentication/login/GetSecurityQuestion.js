@@ -28,7 +28,7 @@ function GetSecurityQuestion() {
     const retrieveQuestion = async () => {
       try {
         const response = await axios.post(
-          process.env.REACT_APP_GET_SECURITY_QUESTION,
+          `${process.env.REACT_APP_BACKEND_URL}/security/login-security`,
           {
             id: parseInt(user.id),
           }

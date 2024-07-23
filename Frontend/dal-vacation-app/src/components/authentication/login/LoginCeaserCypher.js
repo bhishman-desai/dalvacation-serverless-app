@@ -42,7 +42,7 @@ function LoginCeaserCypher() {
     const retrieveQuestion = async () => {
       try {
         const response = await axios.post(
-          process.env.REACT_APP_LOGIN_CEASER_CYPHER,
+          `${process.env.REACT_APP_BACKEND_URL}/cipher/get-cipher`,
           {
             id: parseInt(user.id),
           }
