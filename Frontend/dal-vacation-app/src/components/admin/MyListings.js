@@ -19,7 +19,6 @@ function MyListings() {
     axios
       .get(`https://3fx7fnjghthayrgvbondps5wpa0ygrod.lambda-url.us-east-1.on.aws/?userId=${userId}`)
       .then((response) => {
-        console.log(response.data);
         if (Array.isArray(response.data.rooms)) {
           setListings(response.data.rooms);
         } else {
@@ -30,7 +29,7 @@ function MyListings() {
   }, [userId]);
 
   const handleUpdate = (room) => {
-    navigate("/update-room", { state: { room } });
+    navigate("/", { state: { room } });
   };
 
   return (
@@ -48,14 +47,6 @@ function MyListings() {
                   <Typography>Price: ${listing.price} per night</Typography>
                   <Typography>Room Number: {listing.room_no}</Typography>
                   <Typography>Features: {listing.features.join(", ")}</Typography>
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={() => handleUpdate(listing)}
-                    sx={{ mt: 2 }}
-                  >
-                    Update
-                  </Button>
                 </CardContent>
               </Card>
             </Grid>

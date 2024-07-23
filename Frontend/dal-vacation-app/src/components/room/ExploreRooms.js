@@ -15,9 +15,7 @@ const RoomList = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch(
-      "https://3fx7fnjghthayrgvbondps5wpa0ygrod.lambda-url.us-east-1.on.aws/"
-    )
+    fetch(process.env.REACT_APP_EXPLORE_ROOMS)
       .then((response) => response.json())
       .then((data) => {
         if (data && Array.isArray(data.rooms)) {

@@ -82,11 +82,10 @@ function LoginCeaserCypher() {
   const submitHandler = async (e) => {
     e.preventDefault();
     if (answer === caesarCipher(string, cypherKey)) {
-      const sendEmail = await axios.post("https://jmwefvfgih.execute-api.us-east-1.amazonaws.com/DalVacation/sendEmail", {
+      const sendEmail = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/send-email`, {
         email: user.email,
         body:"Logged In"
       })
-      console.log(sendEmail);
       localStorage.setItem("userId", user.id);
       localStorage.setItem("userEmail", user.email);
       localStorage.setItem("Role", user.role);

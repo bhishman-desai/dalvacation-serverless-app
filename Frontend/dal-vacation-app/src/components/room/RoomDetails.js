@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import axios from "axios";
 import {
   Box,
   Button,
@@ -54,12 +55,11 @@ const RoomDetails = () => {
       })
       .then((data) => {
         alert("Room booked successfully!");
-        console.log("data............", data);
       })
       .catch((error) => console.error("Error booking room:", error));
   };
 
-  const handleReviewSubmit = () => {
+  const handleReviewSubmit = async () => {
     const reviewData = {
       description: newReview,
       roomId: room.roomId,
@@ -67,7 +67,7 @@ const RoomDetails = () => {
     };
 
     fetch(
-      "https://ncsf6xijm6.execute-api.us-east-1.amazonaws.com/test/looker-studio",
+      `${process.env.REACT_APP_BACKEND_URL}/looker-studio`,
       {
         method: "POST",
         headers: {
@@ -87,6 +87,18 @@ const RoomDetails = () => {
         setNewReview("");
       })
       .catch((error) => console.error("Error adding review:", error));
+
+      await axios.post(
+        `${process.env.REACT_APP_BACKEND_URL}/reviews`,
+        {
+          roomId: room.roomId,
+          email: localStorage.getItem("userEmail"),
+          username: localStorage.getItem("userName"),
+          description: newReview,
+          action: "addReview",
+        },
+        { headers: { "Content-Type": "application/json" } }
+      );
   };
 
   return (
@@ -169,7 +181,7 @@ const RoomDetails = () => {
           </Box>
         </CardContent>
       </Card>
-      <Reviews roomId={room.roomId}/>
+      <Reviews roomId={room.roomId} review={newReview}/>
     </Container>
   );
 };

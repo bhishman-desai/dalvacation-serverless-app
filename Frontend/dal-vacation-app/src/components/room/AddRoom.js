@@ -84,10 +84,9 @@ function AddRoom() {
       try {
         const formDataToSend = formData;
         const response = await axios.post(
-          `https://65dmya5fhxtivlldh4zt45lpjq0awspv.lambda-url.us-east-1.on.aws/`,
+          process.env.REACT_APP_ADD_ROOMS,
           formDataToSend
         );
-        console.log("Add room response: " + response);
         navigate("/my-listings");
       } catch (error) {
         console.error("Error:", error);

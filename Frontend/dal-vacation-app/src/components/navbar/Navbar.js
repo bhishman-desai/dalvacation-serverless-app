@@ -51,7 +51,14 @@ function Navbar() {
             >
               Dashboard
             </Button>
-
+            <Button
+            color="inherit"
+            component={Link}
+            to="/my-listings"
+            sx={{ ml: 2 }}
+            >
+              My Listings
+            </Button>
             <Button
             color="inherit"
             component={Link}

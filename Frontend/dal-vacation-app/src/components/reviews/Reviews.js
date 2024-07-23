@@ -4,45 +4,45 @@ import { Card, CardContent, Typography, Grid, Container } from "@mui/material";
 
 function Reviews({ roomId }) {
   const [reviews, setReviews] = useState([]);
-  const userEmail = localStorage.getItem("userEmail");
 
   useEffect(() => {
     const fetchReviews = async () => {
       try {
         const response = await axios.post(
-          "https://d5vbhid2fj.execute-api.us-east-1.amazonaws.com/dal-vacation/looker-get",
-          { email: userEmail, roomId },
+          `${process.env.REACT_APP_BACKEND_URL}/reviews`,
+          {
+            roomId: roomId,
+            action: "getReviews",
+          },
           { headers: { "Content-Type": "application/json" } }
         );
 
-        console.log("Reviews fetched successfully:", JSON.stringify(response));
+        const getReview = response.data.body;
+        console.log(getReview);
 
-        const data = JSON.parse(response.data.body);
-
-        if (data && data.firestoreData) {
-          const filteredReviews = data.firestoreData.filter(
-            (review) => review.roomDetails.roomId === roomId
-          );
-          setReviews(filteredReviews);
+        if (Array.isArray(getReview)) {
+          setReviews(getReview);
         } else {
-          console.log("No reviews found.");
+          console.log("No reviews found for this room.");
+          setReviews([]);
         }
       } catch (error) {
         console.error("Error fetching reviews:", error);
+        setReviews([]);
       }
     };
 
-    if (userEmail) {
+    if (roomId) {
       fetchReviews();
     } else {
-      console.error("User email not found in local storage.");
+      console.error("Room ID not provided.");
     }
-  }, [userEmail, roomId,]);
+  }, [roomId]);
 
   const getSentimentPolarity = (sentimentScore) => {
-    if (sentimentScore.score > 0) {
+    if (sentimentScore > 0) {
       return "Positive";
-    } else if (sentimentScore.score < 0) {
+    } else if (sentimentScore < 0) {
       return "Negative";
     } else {
       return "Neutral";
@@ -62,10 +62,11 @@ function Reviews({ roomId }) {
                 <CardContent>
                   <Typography variant="h6">{review.description}</Typography>
                   <Typography color="textSecondary">
-                    Username: {review.userDetails.username}
+                    Username: {review.username}
                   </Typography>
                   <Typography color="textSecondary">
-                    Polarity: {getSentimentPolarity(review.sentimentScore)}
+                    Polarity:{" "}
+                    {getSentimentPolarity(review.sentimentScore.score)}
                   </Typography>
                 </CardContent>
               </Card>
