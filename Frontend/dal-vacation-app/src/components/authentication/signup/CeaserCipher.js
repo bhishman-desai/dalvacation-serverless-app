@@ -23,7 +23,7 @@ const CeaserCipher = () => {
     try {
       setLoading(true);
       const response = await axios.post(
-        process.env.REACT_APP_SIGNUP_CEASER_CYPHER,
+        `${process.env.REACT_APP_BACKEND_URL}/cipher/store-cipher`,
         { id: parseInt(userId), key }
       );
       
