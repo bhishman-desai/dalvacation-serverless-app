@@ -30,7 +30,7 @@ function SecurityQuestions() {
     try {
       setLoading(true);
       const response = await axios.post(
-        process.env.REACT_APP_SIGNUP_SECURITY_QUESTION,
+        `${process.env.REACT_APP_BACKEND_URL}/security/signup-security`,
         {
           id: parseInt(userId),
           answers: answer,

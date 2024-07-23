@@ -48,7 +48,7 @@ function Signup() {
     try {
       setLoading(true);
       const responseSignup = await axios.post(
-        process.env.REACT_APP_SIGNUP_URL,
+        `${process.env.REACT_APP_BACKEND_URL}/auth/signup`,
         { username, email, password, role }
       );
       if (responseSignup.data.statusCode === 400) {
