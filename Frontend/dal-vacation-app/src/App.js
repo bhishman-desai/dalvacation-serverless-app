@@ -17,6 +17,7 @@ import AddRoom from './components/room/AddRoom';
 import toast, { Toaster } from 'react-hot-toast';
 import RoomDetails from './components/room/RoomDetails';
 import MyListings from './components/admin/MyListings';
+import UpdateListing from './components/admin/UpdateListing';
 
 function App() {
   return (
@@ -37,6 +38,7 @@ function App() {
         <Route path='/add-room' element={<AddRoom/>} />
         <Route path='/explore-rooms/:roomId' element={<RoomDetails/>} />
         <Route path='/my-listings' element={<MyListings/>} />
+        <Route path='/update-listing' element={<UpdateListing/>} />
       </Routes>
       <Footer/>
       <Toaster />
