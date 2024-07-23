@@ -29,7 +29,7 @@ function MyListings() {
   }, [userId]);
 
   const handleUpdate = (room) => {
-    navigate("/", { state: { room } });
+    navigate("/update-listing", { state: { room } });
   };
 
   return (
@@ -48,6 +48,13 @@ function MyListings() {
                   <Typography>Room Number: {listing.room_no}</Typography>
                   <Typography>Features: {listing.features.join(", ")}</Typography>
                 </CardContent>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={() => handleUpdate(listing)}
+                >
+                  Update
+                </Button>
               </Card>
             </Grid>
           ))
