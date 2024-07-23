@@ -96,7 +96,7 @@ resource "google_cloud_run_v2_service" "dal_vacation_service" {
 
       /* Default port - 3000 for react app */
       ports {
-        container_port = 80
+        container_port = 8080
       }
 
       /* Environment Variables */
