@@ -67,7 +67,7 @@ const RoomDetails = () => {
     };
 
     fetch(
-      `${process.env.REACT_APP_BACKEND_URL}/looker-studio`,
+      `https://d5vbhid2fj.execute-api.us-east-1.amazonaws.com/dal-vacation/looker-studio`,
       {
         method: "POST",
         headers: {
@@ -89,7 +89,7 @@ const RoomDetails = () => {
       .catch((error) => console.error("Error adding review:", error));
 
       await axios.post(
-        `${process.env.REACT_APP_BACKEND_URL}/reviews`,
+        `https://d5vbhid2fj.execute-api.us-east-1.amazonaws.com/dal-vacation/reviews`,
         {
           roomId: room.roomId,
           email: localStorage.getItem("userEmail"),

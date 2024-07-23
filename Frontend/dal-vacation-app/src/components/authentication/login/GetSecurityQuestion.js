@@ -28,7 +28,7 @@ function GetSecurityQuestion() {
     const retrieveQuestion = async () => {
       try {
         const response = await axios.post(
-          `${process.env.REACT_APP_BACKEND_URL}/security/login-security`,
+          `https://d5vbhid2fj.execute-api.us-east-1.amazonaws.com/dal-vacation/security/login-security`,
           {
             id: parseInt(user.id),
           }

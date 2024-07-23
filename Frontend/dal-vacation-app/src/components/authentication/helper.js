@@ -19,7 +19,7 @@ export const session = () => {
         } else {
           console.log("User session details:", data.UserAttributes[0].Value);
           const res = await axios.post(
-            `${process.env.REACT_APP_BACKEND_URL}/auth/get-user-profile`,
+            `https://d5vbhid2fj.execute-api.us-east-1.amazonaws.com/dal-vacation/auth/get-user-profile`,
             { email: data.UserAttributes[0].Value }
           );
           console.log(res);

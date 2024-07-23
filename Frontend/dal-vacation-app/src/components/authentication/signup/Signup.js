@@ -48,8 +48,7 @@ function Signup() {
     try {
       setLoading(true);
       const responseSignup = await axios.post(
-        console.log("Backend URL: ", process.env.REACT_APP_BACKEND_URL)
-        `${process.env.REACT_APP_BACKEND_URL}/auth/signup`,
+        `https://d5vbhid2fj.execute-api.us-east-1.amazonaws.com/dal-vacation/auth/signup`,
         { username, email, password, role }
       );
       if (responseSignup.data.statusCode === 400) {
@@ -57,7 +56,7 @@ function Signup() {
         setLoading(false);
       } else {
         const response = await axios.post(
-          `${process.env.REACT_APP_BACKEND_URL}/store-user-details`,
+          `https://d5vbhid2fj.execute-api.us-east-1.amazonaws.com/dal-vacation/store-user-details`,
           { username, email, role }
         );
         setLoading(false);
