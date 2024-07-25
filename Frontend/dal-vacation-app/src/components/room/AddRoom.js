@@ -55,6 +55,7 @@ function AddRoom() {
       price: price,
       features: features.map((feature) => feature.value),
       room_no: roomNumber,
+      userId: localStorage.getItem("userId"),
     }));
   }, [roomType, price, features, roomNumber]);
 
@@ -83,10 +84,9 @@ function AddRoom() {
       try {
         const formDataToSend = formData;
         const response = await axios.post(
-          `https://nb7bcz6mszpt2ncrtw2phxs6wq0rzuhe.lambda-url.us-east-1.on.aws/`,
+          "https://65dmya5fhxtivlldh4zt45lpjq0awspv.lambda-url.us-east-1.on.aws/",
           formDataToSend
         );
-        console.log("Add blog response: " + response);
         navigate("/my-listings");
       } catch (error) {
         console.error("Error:", error);

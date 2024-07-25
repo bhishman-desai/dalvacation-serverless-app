@@ -17,27 +17,24 @@ const CeaserCipher = () => {
   const userId = localStorage.getItem('userId');
   const userEmail = localStorage.getItem('userEmail');
   const navigate = useNavigate();
-  console.log(userEmail)
 
   const submitHandler = async (e) => {
     e.preventDefault();
     try {
       setLoading(true);
       const response = await axios.post(
-        process.env.REACT_APP_SIGNUP_CEASER_CYPHER,
+        `https://d5vbhid2fj.execute-api.us-east-1.amazonaws.com/dal-vacation/cipher/store-cipher`,
         { id: parseInt(userId), key }
       );
-      console.log("Cypher: ", response);
       
-      const confirmUser = await axios.post("https://jmwefvfgih.execute-api.us-east-1.amazonaws.com/DalVacation/auth/confirmUser", {
+      const confirmUser = await axios.post(`https://d5vbhid2fj.execute-api.us-east-1.amazonaws.com/dal-vacation/auth/confirm-user`, {
         username: userEmail
       })
-      const sendEmail = await axios.post("https://jmwefvfgih.execute-api.us-east-1.amazonaws.com/DalVacation/sendEmail", {
+      const sendEmail = await axios.post(`https://d5vbhid2fj.execute-api.us-east-1.amazonaws.com/dal-vacation/send-email`, {
         email: userEmail,
         body:"Registered"
       })
       
-      console.log("Confirm User: ", confirmUser);
       setLoading(false);
       if(confirmUser.data.statusCode === 200) {
         navigate("/login");

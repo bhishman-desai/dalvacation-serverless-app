@@ -10,11 +10,14 @@ import GetSecurityQuestion from './components/authentication/login/GetSecurityQu
 import LoginCeaserCypher from './components/authentication/login/LoginCeaserCypher';
 import Footer from './components/footer/Footer';
 import Home from './components/homePage/Home';
-import ExploreRooms from "./components/ExploreRooms";
+import ExploreRooms from "./components/room/ExploreRooms";
 import Dashboard from './components/admin/Dashboard';
 import KommunicateChat from "./components/ChatBot/Chabot";
 import AddRoom from './components/room/AddRoom';
 import toast, { Toaster } from 'react-hot-toast';
+import RoomDetails from './components/room/RoomDetails';
+import MyListings from './components/admin/MyListings';
+import UpdateListing from './components/admin/UpdateListing';
 
 function App() {
   return (
@@ -33,6 +36,9 @@ function App() {
         <Route path='/explore-rooms' element={<ExploreRooms/>}/>
         <Route path='/admin/dashboard' element={<Dashboard/>} />
         <Route path='/add-room' element={<AddRoom/>} />
+        <Route path='/explore-rooms/:roomId' element={<RoomDetails/>} />
+        <Route path='/my-listings' element={<MyListings/>} />
+        <Route path='/update-listing' element={<UpdateListing/>} />
       </Routes>
       <Footer/>
       <Toaster />

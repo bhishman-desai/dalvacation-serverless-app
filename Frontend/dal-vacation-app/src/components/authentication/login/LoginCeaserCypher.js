@@ -42,7 +42,7 @@ function LoginCeaserCypher() {
     const retrieveQuestion = async () => {
       try {
         const response = await axios.post(
-          process.env.REACT_APP_LOGIN_CEASER_CYPHER,
+          `https://d5vbhid2fj.execute-api.us-east-1.amazonaws.com/dal-vacation/cipher/get-cipher`,
           {
             id: parseInt(user.id),
           }
@@ -82,11 +82,10 @@ function LoginCeaserCypher() {
   const submitHandler = async (e) => {
     e.preventDefault();
     if (answer === caesarCipher(string, cypherKey)) {
-      const sendEmail = await axios.post("https://jmwefvfgih.execute-api.us-east-1.amazonaws.com/DalVacation/sendEmail", {
+      const sendEmail = await axios.post(`https://d5vbhid2fj.execute-api.us-east-1.amazonaws.com/dal-vacation/send-email`, {
         email: user.email,
         body:"Logged In"
       })
-      console.log(sendEmail);
       localStorage.setItem("userId", user.id);
       localStorage.setItem("userEmail", user.email);
       localStorage.setItem("Role", user.role);

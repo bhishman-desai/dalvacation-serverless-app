@@ -43,8 +43,8 @@ function Login() {
     setLoading(true);
     try {
       const poolData = {
-        UserPoolId: process.env.REACT_APP_COGNITO_USERPOOL_ID,
-        ClientId: process.env.REACT_APP_COGNITO_CLIENT_ID,
+        UserPoolId: "us-east-1_sO3OYCP1S",
+        ClientId: "1jvuha96edc4vnccvkv5bi6vml",
       };
 
   

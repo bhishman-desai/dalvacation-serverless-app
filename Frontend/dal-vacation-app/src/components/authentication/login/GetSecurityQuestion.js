@@ -20,7 +20,6 @@ function GetSecurityQuestion() {
   const username = localStorage.getItem("username");
   const navigate = useNavigate();
   const { user } = useUserStore();
-  console.log(user)
 
   useEffect(() => {
     if(!user){
@@ -29,12 +28,11 @@ function GetSecurityQuestion() {
     const retrieveQuestion = async () => {
       try {
         const response = await axios.post(
-          process.env.REACT_APP_GET_SECURITY_QUESTION,
+          `https://d5vbhid2fj.execute-api.us-east-1.amazonaws.com/dal-vacation/security/login-security`,
           {
             id: parseInt(user.id),
           }
         );
-        console.log("username" + username, response);
         const { question, answer } = response.data.body;
         setSecurityQuestion(question);
         setCorrectAnswer(answer);
@@ -50,7 +48,6 @@ function GetSecurityQuestion() {
     e.preventDefault();
     if (answer === correctAnswer) {
       navigate("/login/ceaser-cypher");
-      console.log("Answer is correct. Moving to the next step.");
     } else {
       setError("Incorrect answer. Please try again.");
     }
