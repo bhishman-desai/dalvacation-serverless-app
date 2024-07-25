@@ -54,7 +54,7 @@ const RoomDetails = () => {
         return response.json();
       })
       .then((data) => {
-        alert("Room booked successfully!");
+        alert("Room booking request added to queue!");
       })
       .catch((error) => console.error("Error booking room:", error));
   };
