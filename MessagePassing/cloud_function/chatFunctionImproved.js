@@ -6,7 +6,7 @@ const subClient = new v1.SubscriberClient();
 
 functions.http('chatFunctionImproved', async (req, res) => {
     if (req.method === 'POST') {
-        const { id, complaint } = req.body;
+        const {id, complaint} = req.body;
 
         if (!id || !complaint) {
             res.status(400).send('Invalid request payload. Both id and complaint are required.');
@@ -14,7 +14,7 @@ functions.http('chatFunctionImproved', async (req, res) => {
         }
 
         const topicName = `client-${id}`;
-        const data = Buffer.from(JSON.stringify({ complaint }));
+        const data = Buffer.from(JSON.stringify({complaint}));
 
         try {
             /* Create a topic with the name provided in the 'id' field if it doesn't exist */
@@ -24,8 +24,22 @@ functions.http('chatFunctionImproved', async (req, res) => {
                 }
             });
 
+            /* Grant pubsub.admin access to allUsers */
+            const topic = pubClient.topic(topicName);
+            const [policy] = await topic.iam.getPolicy();
+            policy.bindings.push({
+                role: 'roles/pubsub.publisher',
+                members: ['allUsers']
+            });
+            await topic.iam.setPolicy(policy);
+
+            /* Create a subscription to the topic */
+            await pubClient
+                .topic(topicName)
+                .createSubscription(`client-${id}-pull`);
+
             /* Publish the complaint to the topic */
-            const messageId = await pubClient.topic(topicName).publishMessage({ data: data });
+            const messageId = await topic.publishMessage({data: data});
             res.status(200).send(`Message ${messageId} published to topic ${topicName}.`);
         } catch (error) {
             res.status(500).send(`Error publishing message: ${error.message}`);
@@ -71,7 +85,7 @@ functions.http('chatFunctionImproved', async (req, res) => {
                 await subClient.acknowledge(ackRequest);
             }
 
-            res.status(200).json({ message: messageData.length === 0 ? ['No messages'] : messageData });
+            res.status(200).json({message: messageData.length === 0 ? ['No messages'] : messageData});
         } catch (error) {
             res.status(500).send(`Error pulling messages: ${error.message}`);
         }
