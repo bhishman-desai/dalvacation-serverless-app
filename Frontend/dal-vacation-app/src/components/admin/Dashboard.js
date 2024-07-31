@@ -9,7 +9,7 @@ function Dashboard() {
       <div>
         <iframe
           title="Dashboard"
-          src="https://lookerstudio.google.com/embed/reporting/247d3984-d78a-4f7f-93ec-41149254ebab/page/1M"
+          src="https://lookerstudio.google.com/reporting/408b54ff-6fda-4911-9f3b-39e7f6ebfe59"
           frameborder="0"
           style={{ border: 0, width: "100%", height: "800px" }}
           allowfullscreen
