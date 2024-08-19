@@ -1,4 +1,4 @@
-# DALVacationHome Serverless Project - Group 3
+# DALVacationHome Serverless Project
 
 Welcome to the DALVacationHome serverless project! This application is designed to manage vacation home bookings, providing functionalities for three types of users: Guests, Registered Customers, and Property Agents (super users/admin users).
 
@@ -75,11 +75,30 @@ This application is built using a serverless architecture, employing various AWS
     - 2nd factor: Question/Answer (DynamoDB + AWS Lambda)
     - 3rd factor: Caesar cipher (AWS Lambda + DynamoDB)
 
+**Login and Multi-Factor Authentication**
+
+![Login](Report/Images/Login.png "Login Page")
+![MFA Step 1](Report/Images/MFA1.png "MFA Step 1")
+![MFA Step 2](Report/Images/MFA2.png "MFA Step 2")
+![MFA Step 3](Report/Images/MFA3.png "MFA Step 3")
+
 ### Virtual Assistant
 
 - **Online Virtual Assistance**
     - Respond to queries using AWS Lex, DynamoDB, and AWS Lambda
     - Support site navigation, room details retrieval, and customer-agent communication
+
+**Virtual Assistant Interaction**
+
+![Bot Interaction 1](Report/Images/Bot1.png "Bot Interaction 1")
+![Bot Interaction 2](Report/Images/Bot2.png "Bot Interaction 2")
+![Bot Interaction 3](Report/Images/Bot3.png "Bot Interaction 3")
+![Bot Interaction 4](Report/Images/Bot4.png "Bot Interaction 4")
+![Bot Interaction 5](Report/Images/Bot5.png "Bot Interaction 5")
+![Bot Interaction 6](Report/Images/Bot6.png "Bot Interaction 6")
+![Bot Interaction 7](Report/Images/Bot7.png "Bot Interaction 7")
+![Bot Interaction 8](Report/Images/Bot8.png "Bot Interaction 8")
+![Bot Interaction 9](Report/Images/Bot9.png "Bot Interaction 9")
 
 ### Message Passing
 
@@ -92,6 +111,12 @@ This application is built using a serverless architecture, employing various AWS
 - **User Notifications**
     - Send notifications using AWS SNS and AWS SQS
     - Handle registration, login, booking confirmations, and failures
+
+**Notification Module**
+
+![Notification 1](Report/Images/Notification1.png "Notification Example 1")
+![Notification 2](Report/Images/Notification2.png "Notification Example 2")
+![Notification 3](Report/Images/Notification3.png "Notification Example 3")
 
 ### Data Analysis & Visualization
 
@@ -106,6 +131,11 @@ This application is built using a serverless architecture, employing various AWS
     - Hosted on GCP CloudRun
     - Automated deployment using CloudFormation or GCP Cloud Deployment Manager
 
+**Dashboard Module**
+
+![Dashboard 1](Report/Images/Dashboard1.png "Dashboard View 1")
+![Dashboard 2](Report/Images/Dashboard2.png "Dashboard View 2")
+
 ## Testing
 
 - **Validation Tests**
@@ -115,3 +145,5 @@ This application is built using a serverless architecture, employing various AWS
     - API reliability and functionality
     - Lambda/Cloud Function testing
 
+## Deployed Link
+ [Link](https://dal-vacation-service-ugufm5l7ma-uc.a.run.app/)
